@@ -78,6 +78,26 @@ namespace CytarMP
                 session = SetupSessionCallback(netSession);
             
         }
+
+        public Session WaitSession()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void WaitSession(Action<Session> callback)
+        {
+            throw new NotImplementedException();
+        }
+
+        public SessionT WaitSession<SessionT>()
+        {
+            throw new NotImplementedException();
+        }
+
+        public void WaitSession<SessionT>(Action<SessionT> callback)
+        {
+            throw new NotImplementedException();
+        }
     }
     public enum Protocol : byte
     {
