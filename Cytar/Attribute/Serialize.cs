@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace CytarMP
+namespace Cytar
 {
     [System.AttributeUsage(AttributeTargets.Class | AttributeTargets.Field | AttributeTargets.Property, Inherited =false, AllowMultiple =false)]
     sealed class Serialize : Attribute

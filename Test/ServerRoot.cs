@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using CytarMP;
+using Cytar;
 
 namespace Test
 {
-    public class ServerRoot: CytarMP.Room
+    public class ServerRoot: Cytar.APIContext
     {
         [CytarAPI("ETMK")]
         public void EnterMarket()

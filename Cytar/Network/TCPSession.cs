@@ -5,7 +5,7 @@ using System.Text;
 using System.Net;
 using System.Net.Sockets;
 
-namespace CytarMP.Network
+namespace Cytar.Network
 {
     public class TCPSession : NetworkSession
     {

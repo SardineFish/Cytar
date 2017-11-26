@@ -5,7 +5,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 
-namespace CytarMP.Network
+namespace Cytar.Network
 {
     public class CytarTCPServer: CytarNetworkServer
     {
@@ -52,13 +52,13 @@ namespace CytarMP.Network
 
         public override event Action<Exception> OnError;
 
-        public CytarTCPServer(CytarMP cytarMP, string host, int port):base(cytarMP)
+        public CytarTCPServer(Cytar Cytar, string host, int port):base(Cytar)
         {
             Host = host;
             Port = port;
         }
 
-        protected CytarTCPServer(CytarMP cytarMP):base(cytarMP)
+        protected CytarTCPServer(Cytar Cytar):base(Cytar)
         {
             Host = "0.0.0.0";
             Port = 0;

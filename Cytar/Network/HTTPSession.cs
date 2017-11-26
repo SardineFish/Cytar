@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace CytarMP.Network
+namespace Cytar.Network
 {
-    public class WebSocketSession : NetworkSession
+    public class HTTPSession : NetworkSession
     {
         public override bool Connected { get => throw new NotImplementedException(); protected set => throw new NotImplementedException(); }
         public override bool SSID { get => throw new NotImplementedException(); protected set => throw new NotImplementedException(); }
@@ -20,7 +20,6 @@ namespace CytarMP.Network
         {
             throw new NotImplementedException();
         }
-
         public override void Write(byte[] buffer, int offset, int count)
         {
             throw new NotImplementedException();

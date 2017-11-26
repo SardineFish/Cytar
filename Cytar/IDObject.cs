@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace CytarMP
+namespace Cytar
 {
     public abstract class IDObject
     {

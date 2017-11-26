@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading;
 
-namespace CytarMP.Network
+namespace Cytar.Network
 {
     public abstract class CytarNetworkServer
     {
@@ -11,7 +11,7 @@ namespace CytarMP.Network
 
         public abstract Thread ServerThread { get; protected set; }
 
-        public CytarMP CytarMP { get; internal set; }
+        public Cytar Cytar { get; internal set; }
 
         public abstract void Start();
 
@@ -19,9 +19,9 @@ namespace CytarMP.Network
 
         public abstract event Action<Exception> OnError;
 
-        public CytarNetworkServer(CytarMP cytarMP)
+        public CytarNetworkServer(Cytar Cytar)
         {
-            CytarMP = cytarMP;
+            Cytar = Cytar;
         }
     }
 }

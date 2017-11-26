@@ -2,25 +2,23 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Net;
-using System.Net.Http;
+using System.Net.Sockets;
 using System.Threading;
 
-namespace CytarMP.Network
+namespace Cytar.Network
 {
-    public class CytarHTTPServer: CytarNetworkServer
+    public class CytarUDPServer: CytarNetworkServer
     {
-        public HttpListener HttpListener { get; private set; }
+        public UdpClient UdpClient { get; private set; }
         public override bool Running
         {
             get
             {
-                if (HttpListener == null || !HttpListener.IsListening)
+                if (UdpClient == null || !UdpClient.Client.Connected)
                     return false;
                 return true;
             }
         }
-
-        public override event Action<Exception> OnError;
         string host;
         public string Host
         {
@@ -35,6 +33,9 @@ namespace CytarMP.Network
         }
 
         int port;
+
+        public override event Action<Exception> OnError;
+
         public int Port
         {
             get { return port; }
@@ -49,30 +50,21 @@ namespace CytarMP.Network
 
         public override Thread ServerThread { get => throw new NotImplementedException(); protected set => throw new NotImplementedException(); }
 
-        public CytarHTTPServer(CytarMP cytarMP, string host, int port) : base(cytarMP)
+        public CytarUDPServer(Cytar Cytar,string host,int port): base(Cytar)
         {
             Host = host;
             Port = port;
         }
-        async void threadStart()
-        {
-            HttpListener = new HttpListener();
-            HttpListener.Start();
-            while (Running)
-            {
-                var context = await HttpListener.GetContextAsync();
-                HandleHttpRequest(context);
-            }
-        }
 
-        protected void HandleHttpRequest(HttpListenerContext context)
+        protected CytarUDPServer(Cytar Cytar):base (Cytar)
         {
-
+            Host = "0.0.0.0";
+            Port = 0;
         }
 
         public override void Start()
         {
-            
+            throw new NotImplementedException();
         }
 
         public override void Stop()

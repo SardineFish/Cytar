@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 
-namespace CytarMP.Network
+namespace Cytar.Network
 {
     public class CytarNetworkStream : Stream
     {

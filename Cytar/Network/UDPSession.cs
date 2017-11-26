@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace CytarMP.Network
+namespace Cytar.Network
 {
     public class UDPSession : NetworkSession
     {

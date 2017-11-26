@@ -5,17 +5,17 @@ using System.Net;
 using System.Net.WebSockets;
 using System.Threading;
 
-namespace CytarMP.Network
+namespace Cytar.Network
 {
     public class CytarWebSocketServer: CytarNetworkServer
     {
-        public CytarWebSocketServer( CytarMP cytarMP,string host, int port):base(cytarMP)
+        public CytarWebSocketServer( Cytar Cytar,string host, int port):base(Cytar)
         {
             Host = host;
             Port = port;
         }
 
-        public CytarWebSocketServer(CytarMP cytarMP) : base(cytarMP)
+        public CytarWebSocketServer(Cytar Cytar) : base(Cytar)
         {
 
         }

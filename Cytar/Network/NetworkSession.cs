@@ -5,7 +5,7 @@ using System.Threading;
 using System.Net;
 using System.IO;
 
-namespace CytarMP.Network
+namespace Cytar.Network
 {
     public abstract class NetworkSession
     {
@@ -17,6 +17,8 @@ namespace CytarMP.Network
         public abstract int Read(byte[] buffer, int idx, int count);
 
         public abstract void Write(byte[] buffer, int offset, int count);
+
+        public virtual Session Session { get; internal set; }
 
         public abstract int ReadByte();
 

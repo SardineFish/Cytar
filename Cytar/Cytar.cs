@@ -4,11 +4,11 @@ using System.Net.Sockets;
 using System.Net.Http;
 using System.Net.WebSockets;
 using System.Threading;
-using CytarMP.Network;
+using Cytar.Network;
 
-namespace CytarMP
+namespace Cytar
 {
-    public class CytarMP
+    public class Cytar
     {
         public CytarTCPServer TCPServer { get; private set; }
 
@@ -20,7 +20,7 @@ namespace CytarMP
 
         internal Func<NetworkSession, Session> SetupSessionCallback;
 
-        public CytarMP()
+        public Cytar()
         {
             
         }
@@ -40,7 +40,7 @@ namespace CytarMP
             TCPServer = new T();
             TCPServer.Host = host;
             TCPServer.Port = port;
-            TCPServer.CytarMP = this;
+            TCPServer.Cytar = this;
         }
 
         public void UseUDP(string host,int port)

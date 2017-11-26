@@ -42,6 +42,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Gate.cs" />
+    <Compile Include="Hall.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ServerRoot.cs" />
@@ -50,9 +52,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\CytarMP\CytarMP.csproj">
-      <Project>{32e6a84e-0c02-418b-a9b7-bbd0b83dd991}</Project>
-      <Name>CytarMP</Name>
+    <ProjectReference Include="..\Cytar\Cytar.csproj">
+      <Project>{11a335da-92dd-43ee-9d71-c353f6ff2a09}</Project>
+      <Name>Cytar</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
