@@ -8,7 +8,7 @@ namespace Cytar
 {
     public abstract class APIContext
     {
-        public List<APIContext> Children { get; set; }
+        public APIContextChildren Children { get; set; }
 
         public APIContext Parent { get; internal set; }
 
@@ -35,7 +35,7 @@ namespace Cytar
 
         public APIContext()
         {
-            Children = new List<APIContext>();
+            Children = new APIContextChildren(this);
             Sessions = new List<Session>();
         }
     }
