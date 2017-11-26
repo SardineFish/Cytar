@@ -13,6 +13,8 @@ namespace Cytar
     {
         public CytarAPI(string name)
         {
+            if (name.Length > 5)
+                throw new Exception("Over 5 chars.");
             if(!Regex.IsMatch(name, @"^[a-zA-Z0-9_-]+$"))
             {
                 throw new Exception("Invalid Identifier");

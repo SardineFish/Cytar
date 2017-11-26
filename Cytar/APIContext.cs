@@ -14,7 +14,7 @@ namespace Cytar
 
         public List<Session> Sessions { get; set; }
 
-        public virtual object CallAPI(string name, object[] param)
+        public virtual object CallAPI(string name, params object[] param)
         {
             var apiMethods = this.GetType().GetMethods().Where(
                         method => method.GetCustomAttributes(true).Where(

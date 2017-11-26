@@ -16,11 +16,14 @@ namespace Test
             var hall = new Hall();
 
             Cytar.Cytar Cytar = new Cytar.Cytar();
-            //Cytar.UseTCP("127.0.0.1", 36514);
-            /*Cytar.WaitSession((session) =>
-            {
-                session.Join(gate);
-            });*/
+
+            var shop = new Shop();
+            var bag = new List<int>();
+            bag.Add((int)shop.BooksShelf.CallAPI("GetIt", 5));
+            bag.Add((int)shop.FruitsShelf.CallAPI("GetIt", 6));
+            //Total Cost
+            var money = (int)shop.CallAPI("TTCst", bag.ToArray());
+            shop.CallAPI("Pay", money);
 
         }
     }
