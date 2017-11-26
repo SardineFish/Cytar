@@ -7,7 +7,7 @@ using System.IO;
 
 namespace Cytar.Network
 {
-    public abstract class NetworkSession
+    public abstract class NetworkSession: IDObject
     {
         public abstract bool Connected { get; protected set; }
         public abstract bool SSID { get; protected set; }
@@ -19,6 +19,7 @@ namespace Cytar.Network
         public abstract void Write(byte[] buffer, int offset, int count);
 
         public virtual Session Session { get; internal set; }
+        public uint ID { get; internal set; }
 
         public abstract int ReadByte();
 

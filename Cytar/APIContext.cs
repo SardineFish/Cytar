@@ -23,12 +23,23 @@ namespace Cytar
             if (apiMethods.Length <= 0)
             {
                 if (Parent == null)
-                    throw new Exception("API Not Found.");
+                    throw new APINotFoundException(name);
                 return Parent.CallAPI(name, param);
             }
             else
             {
-                return apiMethods[0].Invoke(this, param);
+                try
+                {
+                    return apiMethods[0].Invoke(this, param);
+                }
+                catch (TargetParameterCountException)
+                {
+                    throw new ParamsNotMatchException(this, name);
+                }
+                catch (ArgumentException)
+                {
+                    throw new ParamsNotMatchException(this, name);
+                }
             }
 
         }

@@ -4,8 +4,8 @@ using System.Text;
 
 namespace Cytar
 {
-    public abstract class IDObject
+    public interface IDObject
     {
-        public uint ID { get; set; }
+        uint ID { get; }
     }
 }

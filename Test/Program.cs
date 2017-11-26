@@ -20,7 +20,7 @@ namespace Test
             var shop = new Shop();
             var bag = new List<int>();
             bag.Add((int)shop.BooksShelf.CallAPI("GetIt", 5));
-            bag.Add((int)shop.FruitsShelf.CallAPI("GetIt", 6));
+            bag.Add((int)shop.FruitsShelf.CallAPI("GetIt", "2333"));
             //Total Cost
             var money = (int)shop.CallAPI("TTCst", bag.ToArray());
             shop.CallAPI("Pay", money);

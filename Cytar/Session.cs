@@ -4,6 +4,7 @@ using System.Text;
 using Cytar.Network;
 using System.IO;
 using System.Threading;
+using System.Linq;
 
 namespace Cytar
 {
@@ -13,6 +14,9 @@ namespace Cytar
         public virtual Thread HandleThread { get; protected set; }
 
         public virtual List<APIContext> APIContext { get; protected set; }
+
+        public uint ID { get; internal set; }
+
         public Session(NetworkSession netSession)
         {
             NetworkSession = netSession;
@@ -56,9 +60,35 @@ namespace Cytar
 
         }
 
-        public virtual void APIRoute(string apiName,object[] param)
+        public virtual object CallAPI(string apiName, params object[] param)
         {
-            
+            var apiMethods = this.GetType().GetMethods().Where(
+                        method => method.GetCustomAttributes(true).Where(
+                                attr => attr is CytarAPI && (attr as CytarAPI).Name == apiName).FirstOrDefault() != null)
+                                    .ToArray();
+            if (apiMethods.Length <= 0)
+            {
+                foreach (var context in APIContext)
+                {
+                    try
+                    {
+                        return context.CallAPI(apiName, param);
+                    }
+                    catch (APINotFoundException)
+                    {
+                        continue;
+                    }
+                    catch(Exception ex)
+                    {
+                        throw ex;
+                    }
+                }
+                throw new APINotFoundException(apiName);
+            }
+            else
+            {
+                return apiMethods[0].Invoke(this, param);
+            }
         }
     }
 }
