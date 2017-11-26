@@ -24,6 +24,11 @@ namespace Cytar
             APIContext = new List<APIContext>();
         }
 
+        public Session()
+        {
+            APIContext = new List<APIContext>();
+        }
+
         public virtual void Start()
         {
             HandleThread = new Thread(StartHandle);

@@ -19,11 +19,14 @@ namespace Test
 
             var shop = new Shop();
             var bag = new List<int>();
-            bag.Add((int)shop.BooksShelf.CallAPI("GetIt", 5));
-            bag.Add((int)shop.FruitsShelf.CallAPI("GetIt", "2333"));
+            var man = new Session();
+            man.Join(shop.FruitsShelf);
+            bag.Add((int)man.CallAPI("GetIt", 5));
+            man.Join(shop.MeatShelf);
+            bag.Add((int)man.CallAPI("GetIt", 5));
             //Total Cost
-            var money = (int)shop.CallAPI("TTCst", bag.ToArray());
-            shop.CallAPI("Pay", money);
+            var money = (int)man.CallAPI("TTCst", bag.ToArray());
+            man.CallAPI("Pay", money);
 
         }
     }
