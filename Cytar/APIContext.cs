@@ -6,13 +6,15 @@ using System.Linq;
 
 namespace Cytar
 {
-    public abstract class APIContext
+    public abstract class APIContext: IDObject
     {
         public APIContextChildren Children { get; set; }
 
         public APIContext Parent { get; internal set; }
 
         public List<Session> Sessions { get; set; }
+
+        public uint ID { get; internal set; }
 
         public virtual object CallAPI(string name, params object[] param)
         {
