@@ -15,6 +15,8 @@ namespace Cytar
 
         public virtual List<APIContext> APIContext { get; protected set; }
 
+        public virtual APIContext RootContext { get; set; }
+
         public uint ID { get; internal set; }
 
         public Session(NetworkSession netSession)
@@ -94,6 +96,13 @@ namespace Cytar
             {
                 return apiMethods[0].Invoke(this, param);
             }
+        }
+
+        public virtual object CallPathAPI(string path,params object[] param)
+        {
+            if (this.RootContext == null)
+                throw new NoRootException(this);
+            
         }
     }
 }

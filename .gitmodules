@@ -1,0 +1,3 @@
+[submodule "RoutableObject"]
+	path = RoutableObject
+	url = git@github.com:SardineFish/RoutableObject.git

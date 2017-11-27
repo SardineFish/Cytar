@@ -44,6 +44,15 @@ namespace Cytar
                 }
             }
         }
+        public virtual object CallPathAPI(string path, params object[] param)
+        {
+            var pathList = path.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            if (pathList.Length == 1)
+            {
+                return CallAPI(pathList[0], param);
+            }
+
+        }
 
         public APIContext()
         {
