@@ -50,20 +50,20 @@ namespace Cytar.Serialization
                 var dataList = new List<byte[]>();
                 var properties = obj.GetType().GetProperties().Where(
                     property => property.GetCustomAttributes(true).Where(
-                        attr => attr is SerializableProperty).FirstOrDefault() != null)
+                        attr => attr is SerializablePropertyAttribute).FirstOrDefault() != null)
                         .OrderBy(
                     property => (property.GetCustomAttributes(true).Where(
-                        attr => attr is SerializableProperty).FirstOrDefault() as SerializableProperty).Index).ToArray();
+                        attr => attr is SerializablePropertyAttribute).FirstOrDefault() as SerializablePropertyAttribute).Index).ToArray();
                 foreach (var prop in properties)
                 {
                     dataList.Add(SerializeToBytes(prop.GetValue(obj)));
                 }
                 var fields = obj.GetType().GetFields().Where(
                     field => field.GetCustomAttributes(true).Where(
-                        attr => attr is SerializableProperty).FirstOrDefault() != null)
+                        attr => attr is SerializablePropertyAttribute).FirstOrDefault() != null)
                         .OrderBy(
                     field => (field.GetCustomAttributes(true).Where(
-                        attr => attr is SerializableProperty).FirstOrDefault() as SerializableProperty).Index).ToArray();
+                        attr => attr is SerializablePropertyAttribute).FirstOrDefault() as SerializablePropertyAttribute).Index).ToArray();
                 foreach (var field in fields)
                 {
                     dataList.Add(SerializeToBytes(field.GetValue(obj)));
