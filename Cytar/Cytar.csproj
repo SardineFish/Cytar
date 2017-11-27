@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\EasyRoute\EasyRoute.csproj" />
+    <ProjectReference Include="..\EasyRoute\EasyRoute\EasyRoute.csproj" />
   </ItemGroup>
 
   <ItemGroup>

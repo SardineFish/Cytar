@@ -60,8 +60,8 @@
       <Project>{11a335da-92dd-43ee-9d71-c353f6ff2a09}</Project>
       <Name>Cytar</Name>
     </ProjectReference>
-    <ProjectReference Include="..\EasyRoute\EasyRoute.csproj">
-      <Project>{68c725a5-9b9c-4ae3-a492-db3c19026ef6}</Project>
+    <ProjectReference Include="..\EasyRoute\EasyRoute\EasyRoute.csproj">
+      <Project>{0902ad31-af4d-4070-94ff-47fb515af52c}</Project>
       <Name>EasyRoute</Name>
     </ProjectReference>
   </ItemGroup>
