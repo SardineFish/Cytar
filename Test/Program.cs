@@ -11,16 +11,17 @@ namespace Test
     {
         static void Main(string[] args)
         {
+            Bill bill = new Bill("Billlll");
             var root = new RootClass();
             root.Call("sub/output", "Hello world!");
             root.Call("rootFunc");
-
+            Cytar.Serialization.Serialize.SerializeToBytes(bill);
 
             var serverRoot = new ServerRoot();
             var gate = new Gate();
             var hall = new Hall();
 
-            Cytar.Cytar Cytar = new Cytar.Cytar();
+            Cytar.Cytar cytar = new Cytar.Cytar();
 
             var shop = new Shop();
             var bag = new List<int>();

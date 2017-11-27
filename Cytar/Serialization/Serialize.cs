@@ -13,15 +13,15 @@ namespace Cytar.Serialization
             if (obj is byte)
                 return new byte[] { (byte)obj };
             else if (obj is Int16 || obj is UInt16)
-                return CytarConvert.NumberToBytes((UInt16)obj);
+                return CytarConvert.NumberToBytes(Convert.ToUInt16(obj));
             else if (obj is Int32 || obj is UInt32)
-                return CytarConvert.NumberToBytes((UInt32)obj);
+                return CytarConvert.NumberToBytes(Convert.ToUInt32(obj));
             else if (obj is Int64 || obj is UInt64)
-                return CytarConvert.NumberToBytes((UInt64)obj);
+                return CytarConvert.NumberToBytes(Convert.ToUInt64(obj));
             else if (obj is float)
-                return CytarConvert.NumberToBytes((float)obj);
+                return CytarConvert.NumberToBytes(Convert.ToSingle(obj));
             else if (obj is double)
-                return CytarConvert.NumberToBytes((double)obj);
+                return CytarConvert.NumberToBytes(Convert.ToDouble(obj));
             else if (obj is char)
             {
                 var data = Encoding.UTF8.GetBytes(obj.ToString());
@@ -44,8 +44,8 @@ namespace Cytar.Serialization
             }
             else
             {
-                var attribute = obj.GetType().GetCustomAttributes(true).Where(attr => attr is SerializableProperty).FirstOrDefault() as SerializableProperty;
-                if (attribute == null)
+                //var attribute = obj.GetType().GetCustomAttributes(true).Where(attr => attr is SerializableProperty).FirstOrDefault() as SerializableProperty;
+                if (obj == null)
                     return new byte[] { 0 };
                 var dataList = new List<byte[]>();
                 var properties = obj.GetType().GetProperties().Where(
@@ -85,7 +85,7 @@ namespace Cytar.Serialization
             var idx = 0;
             for(var i = 0; i < data.Length; i++)
             {
-                for(var j = 0;j<(data[i] as byte[]).Length; i++)
+                for(var j = 0;j<(data[i] as byte[]).Length; j++)
                 {
                     buffer[idx++] = (data[i] as byte[])[j];
                 }
