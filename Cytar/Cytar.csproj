@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RoutableObject\RoutableObject.csproj" />
+    <ProjectReference Include="..\EasyRoute\EasyRoute.csproj" />
   </ItemGroup>
 
   <ItemGroup>

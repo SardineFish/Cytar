@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using RoutableObject;
+using EasyRoute;
 
 namespace Test
 {
     [Routable]
-    public class RootClass:RoutableObject.RoutableObject
+    public class RootClass:RoutableObject
     {
         [Routable]
-        public class SubClass : RoutableObject.RoutableObject
+        public class SubClass : RoutableObject
         {
             [Routable("number")]
             public int Number { get; set; }

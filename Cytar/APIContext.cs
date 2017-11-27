@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
 using System.Linq;
-using RoutableObject;
+using EasyRoute;
 
 namespace Cytar
 {
-    public abstract class APIContext: RoutableObject.RoutableObject, IDObject
+    public abstract class APIContext: RoutableObject, IDObject
     {
         public APIContextChildren Children { get; set; }
 

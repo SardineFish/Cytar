@@ -5,11 +5,11 @@ using Cytar.Network;
 using System.IO;
 using System.Threading;
 using System.Linq;
-using RoutableObject;
+using EasyRoute;
 
 namespace Cytar
 {
-    public class Session:RoutableObject.RoutableObject, IDObject
+    public class Session: RoutableObject, IDObject
     {
         public virtual NetworkSession NetworkSession { get; protected set; }
         public virtual Thread HandleThread { get; protected set; }

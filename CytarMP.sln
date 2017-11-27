@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cytar", "Cytar\Cytar.csproj", "{11A335DA-92DD-43EE-9D71-C353F6FF2A09}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RoutableObject", "RoutableObject\RoutableObject.csproj", "{52E5896C-677E-4341-920D-005DCF4011ED}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EasyRoute", "EasyRoute\EasyRoute.csproj", "{68C725A5-9B9C-4AE3-A492-DB3C19026EF6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -25,10 +25,10 @@ Global
 		{11A335DA-92DD-43EE-9D71-C353F6FF2A09}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{11A335DA-92DD-43EE-9D71-C353F6FF2A09}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{11A335DA-92DD-43EE-9D71-C353F6FF2A09}.Release|Any CPU.Build.0 = Release|Any CPU
-		{52E5896C-677E-4341-920D-005DCF4011ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{52E5896C-677E-4341-920D-005DCF4011ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{52E5896C-677E-4341-920D-005DCF4011ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{52E5896C-677E-4341-920D-005DCF4011ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{68C725A5-9B9C-4AE3-A492-DB3C19026EF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68C725A5-9B9C-4AE3-A492-DB3C19026EF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68C725A5-9B9C-4AE3-A492-DB3C19026EF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{68C725A5-9B9C-4AE3-A492-DB3C19026EF6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
