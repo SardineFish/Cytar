@@ -102,7 +102,7 @@ namespace Cytar
         {
             if (this.RootContext == null)
                 throw new NoRootException(this);
-            
+            return null;
         }
     }
 }

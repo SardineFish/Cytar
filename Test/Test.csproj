@@ -47,6 +47,7 @@
     <Compile Include="Hall.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="RootClass.cs" />
     <Compile Include="ServerRoot.cs" />
     <Compile Include="Shelf.cs" />
     <Compile Include="Shop.cs" />
@@ -58,6 +59,10 @@
     <ProjectReference Include="..\Cytar\Cytar.csproj">
       <Project>{11a335da-92dd-43ee-9d71-c353f6ff2a09}</Project>
       <Name>Cytar</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RoutableObject\RoutableObject.csproj">
+      <Project>{52e5896c-677e-4341-920d-005dcf4011ed}</Project>
+      <Name>RoutableObject</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

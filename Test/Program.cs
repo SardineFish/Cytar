@@ -11,6 +11,11 @@ namespace Test
     {
         static void Main(string[] args)
         {
+            var root = new RootClass();
+            root.Call("sub/output", "Hello world!");
+            root.Call("rootFunc");
+
+
             var serverRoot = new ServerRoot();
             var gate = new Gate();
             var hall = new Hall();

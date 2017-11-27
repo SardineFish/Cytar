@@ -51,7 +51,7 @@ namespace Cytar
             {
                 return CallAPI(pathList[0], param);
             }
-
+            return null;
         }
 
         public APIContext()
