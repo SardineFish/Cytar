@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="APITest.cs" />
+    <Compile Include="Bill.cs" />
     <Compile Include="Gate.cs" />
     <Compile Include="Hall.cs" />
     <Compile Include="Program.cs" />
