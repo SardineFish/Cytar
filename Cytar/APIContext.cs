@@ -43,7 +43,6 @@ namespace Cytar
                     throw new ParamsNotMatchException(this, name);
                 }
             }
-
         }
 
         public APIContext()
