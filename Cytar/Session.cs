@@ -5,10 +5,11 @@ using Cytar.Network;
 using System.IO;
 using System.Threading;
 using System.Linq;
+using RoutableObject;
 
 namespace Cytar
 {
-    public class Session: IDObject
+    public class Session:RoutableObject.RoutableObject, IDObject
     {
         public virtual NetworkSession NetworkSession { get; protected set; }
         public virtual Thread HandleThread { get; protected set; }
@@ -100,9 +101,24 @@ namespace Cytar
 
         public virtual object CallPathAPI(string path,params object[] param)
         {
-            if (this.RootContext == null)
-                throw new NoRootException(this);
-            return null;
+            if (path.StartsWith("/"))
+            {
+                if (this.RootContext == null)
+                    throw new NoRootException(this);
+                return this.RootContext.CallPathAPI(path.Substring(1), param);
+            }
+            try
+            {
+                return Call(path, param);
+            }
+            catch (MemberNotFoundException)
+            {
+                throw new APINotFoundException(path);
+            }
+            catch (UnreachableException)
+            {
+                throw new APINotFoundException(path);
+            }
         }
     }
 }

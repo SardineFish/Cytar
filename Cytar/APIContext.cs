@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Text;
 using System.Reflection;
 using System.Linq;
+using RoutableObject;
 
 namespace Cytar
 {
-    public abstract class APIContext: IDObject
+    public abstract class APIContext: RoutableObject.RoutableObject, IDObject
     {
         public APIContextChildren Children { get; set; }
 
@@ -46,12 +47,18 @@ namespace Cytar
         }
         public virtual object CallPathAPI(string path, params object[] param)
         {
-            var pathList = path.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
-            if (pathList.Length == 1)
+            try
             {
-                return CallAPI(pathList[0], param);
+                return Call(path, param);
             }
-            return null;
+            catch(MemberNotFoundException)
+            {
+                throw new APINotFoundException(path);
+            }
+            catch (UnreachableException)
+            {
+                throw new APINotFoundException(path);
+            }
         }
 
         public APIContext()

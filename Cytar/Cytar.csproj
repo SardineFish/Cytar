@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\RoutableObject\RoutableObject.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="UnityEngine">
       <HintPath>E:\Unity\Editor\Data\Managed\UnityEngine.dll</HintPath>
     </Reference>
