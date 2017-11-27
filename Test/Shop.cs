@@ -9,8 +9,11 @@ namespace Test
 {
     public class Shop:APIContext
     {
+        [CytarAPI("fruit")]
         public Shelf FruitsShelf = new Shelf();
+        [CytarAPI("books")]
         public Shelf BooksShelf = new Shelf();
+        [CytarAPI("meat")]
         public Shelf MeatShelf = new Shelf();
 
         [CytarAPI("TTCst")]

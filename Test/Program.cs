@@ -25,6 +25,8 @@ namespace Test
             var shop = new Shop();
             var bag = new List<int>();
             var man = new Session();
+            man.RootContext = shop;
+            bag.Add((int)man.CallPathAPI("/fruit/GetIt", 10));
             man.Join(shop.FruitsShelf);
             bag.Add((int)man.CallAPI("GetIt", 5));
             man.Join(shop.MeatShelf);
