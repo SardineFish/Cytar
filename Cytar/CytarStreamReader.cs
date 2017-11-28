@@ -33,15 +33,15 @@ namespace Cytar
 
         public Int16 ReadInt16() => CytarConvert.ToInt16(ReadBytes(2));
 
-        public UInt16 ReadUInt16() => (UInt16)CytarConvert.ToInt16(ReadBytes(2));
+        public UInt16 ReadUInt16() => CytarConvert.ToUInt16(ReadBytes(2));
 
         public Int32 ReadInt32() => CytarConvert.ToInt32(ReadBytes(4));
 
-        public UInt32 ReadUInt32() => (UInt32)CytarConvert.ToInt32(ReadBytes(4));
+        public UInt32 ReadUInt32() => CytarConvert.ToUInt32(ReadBytes(4));
 
         public Int64 ReadInt64() => CytarConvert.ToInt64(ReadBytes(4));
 
-        public UInt64 ReadUInt64() => (UInt64)CytarConvert.ToInt64(ReadBytes(2));
+        public UInt64 ReadUInt64() => CytarConvert.ToUInt64(ReadBytes(2));
 
         public float ReadSingle() => CytarConvert.ToSingle(ReadBytes(4));
 

@@ -18,6 +18,12 @@ namespace Cytar
                 ((Int16)data[0] << 0) | 
                 ((Int16)data[1] << 8));
         }
+        public static UInt16 ToUInt16(byte[] data)
+        {
+            return (UInt16)(
+                ((UInt16)data[0] << 0) |
+                ((UInt16)data[1] << 8));
+        }
         public static Int32 ToInt32(byte[] data)
         {
             return (Int32)(
@@ -25,6 +31,14 @@ namespace Cytar
                 ((Int32)data[1] << 8) |
                 ((Int32)data[2] << 16) |
                 ((Int32)data[3] << 24));
+        }
+        public static UInt32 ToUInt32(byte[] data)
+        {
+            return (UInt32)(
+                ((UInt32)data[0] << 0) |
+                ((UInt32)data[1] << 8) |
+                ((UInt32)data[2] << 16) |
+                ((UInt32)data[3] << 24));
         }
         public static Int64 ToInt64(byte[] data)
         {
@@ -37,6 +51,18 @@ namespace Cytar
                 ((Int64)data[5] << 40) |
                 ((Int64)data[6] << 48) |
                 ((Int64)data[7] << 56));
+        }
+        public static UInt64 ToUInt64(byte[] data)
+        {
+            return (UInt64)(
+                ((UInt64)data[0] << 0) |
+                ((UInt64)data[1] << 8) |
+                ((UInt64)data[2] << 16) |
+                ((UInt64)data[3] << 24) |
+                ((UInt64)data[4] << 32) |
+                ((UInt64)data[5] << 40) |
+                ((UInt64)data[6] << 48) |
+                ((UInt64)data[7] << 56));
         }
         public static float ToSingle(byte[] data)
         {
@@ -83,6 +109,8 @@ namespace Cytar
                     (byte)((number & 0xFF00)>>8)
                 };
         }
+        public static byte[] ToBytes(Int16 number) => ToBytes((UInt16)number);
+
         public static byte[] ToBytes(UInt32 number)
         {
             return new byte[]
@@ -93,6 +121,8 @@ namespace Cytar
                     (byte)((number & 0xFF000000)>>24)
                 };
         }
+        public static byte[] ToBytes(Int32 number) => ToBytes((UInt32)number);
+
         public static byte[] ToBytes(UInt64 number)
         {
             return new byte[]
@@ -107,13 +137,10 @@ namespace Cytar
                     (byte)((number & 0xFF00000000000000)>>56),
                 };
         }
-        public static byte[] ToBytes(float number)
-        {
-            return BitConverter.GetBytes(number);
-        }
-        public static byte[] ToBytes(double number)
-        {
-            return BitConverter.GetBytes(number);
-        }
+        public static byte[] ToBytes(Int64 number) => ToBytes((UInt64)number);
+
+        public static byte[] ToBytes(float number) => BitConverter.GetBytes(number);
+
+        public static byte[] ToBytes(double number) => BitConverter.GetBytes(number);
     }
 }
