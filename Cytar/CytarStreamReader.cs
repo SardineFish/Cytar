@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace Cytar.Exceptions
+namespace Cytar
 {
     public class CytarStreamReader
     {
@@ -31,21 +31,21 @@ namespace Cytar.Exceptions
 
         public byte ReadByte() => ReadBytes(1)[0];
 
-        public Int16 ReadInt16() => CytarConvert.BytesToInt16(ReadBytes(2));
+        public Int16 ReadInt16() => CytarConvert.ToInt16(ReadBytes(2));
 
-        public UInt16 ReadUInt16() => (UInt16)CytarConvert.BytesToInt16(ReadBytes(2));
+        public UInt16 ReadUInt16() => (UInt16)CytarConvert.ToInt16(ReadBytes(2));
 
-        public Int32 ReadInt32() => CytarConvert.BytesToInt32(ReadBytes(4));
+        public Int32 ReadInt32() => CytarConvert.ToInt32(ReadBytes(4));
 
-        public UInt32 ReadUInt32() => (UInt32)CytarConvert.BytesToInt32(ReadBytes(4));
+        public UInt32 ReadUInt32() => (UInt32)CytarConvert.ToInt32(ReadBytes(4));
 
-        public Int64 ReadInt64() => CytarConvert.BytesToInt64(ReadBytes(4));
+        public Int64 ReadInt64() => CytarConvert.ToInt64(ReadBytes(4));
 
-        public UInt64 ReadUInt64() => (UInt64)CytarConvert.BytesToInt64(ReadBytes(2));
+        public UInt64 ReadUInt64() => (UInt64)CytarConvert.ToInt64(ReadBytes(2));
 
-        public float ReadSingle() => CytarConvert.BytesToSingle(ReadBytes(4));
+        public float ReadSingle() => CytarConvert.ToSingle(ReadBytes(4));
 
-        public double ReadDouble() => CytarConvert.BytesToDouble(ReadBytes(8));
+        public double ReadDouble() => CytarConvert.ToDouble(ReadBytes(8));
 
         public char ReadChar()
         {

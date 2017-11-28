@@ -15,24 +15,24 @@ namespace Cytar.Serialization
             if (type == typeof(byte))
                 return data[0];
             else if (type == typeof(UInt16))
-                return (UInt16)CytarConvert.BytesToInt16(data);
+                return (UInt16)CytarConvert.ToInt16(data);
             else if (type == typeof(Int16))
-                return CytarConvert.BytesToInt16(data);
+                return CytarConvert.ToInt16(data);
             else if (type == typeof(UInt32))
-                return (UInt32)CytarConvert.BytesToInt32(data);
+                return (UInt32)CytarConvert.ToInt32(data);
             else if (type == typeof(Int32))
-                return CytarConvert.BytesToInt32(data);
+                return CytarConvert.ToInt32(data);
             else if (type == typeof(UInt64))
-                return (UInt64)CytarConvert.BytesToInt64(data);
+                return (UInt64)CytarConvert.ToInt64(data);
             else if (type == typeof(Int64))
-                return CytarConvert.BytesToInt64(data);
+                return CytarConvert.ToInt64(data);
             else if (type == typeof(Single))
-                return CytarConvert.BytesToSingle(data);
+                return CytarConvert.ToSingle(data);
             else if (type == typeof(Double))
-                return CytarConvert.BytesToDouble(data);
+                return CytarConvert.ToDouble(data);
             else if (type == typeof(char))
             {
-                var length = CytarConvert.BytesToByte(data.Take(1).ToArray());
+                var length = CytarConvert.ToByte(data.Take(1).ToArray());
                 if (length != data.Length - 1)
                     throw new DataSizeException(data, length + 1);
                 var decode = Encoding.UTF8.GetString(data.SubBytes(1));
@@ -42,13 +42,13 @@ namespace Cytar.Serialization
             }
             else if (type == typeof(string))
             {
-                var length = CytarConvert.BytesToInt32(data.Take(4).ToArray());
+                var length = CytarConvert.ToInt32(data.Take(4).ToArray());
                 return Encoding.UTF8.GetString(data.SubBytes(4));
             }
             else if (type.IsArray)
             {
-                var size = CytarConvert.BytesToInt32(data.Take(4).ToArray());
-                var count = CytarConvert.BytesToInt32(data.SubBytes(4, 4));
+                var size = CytarConvert.ToInt32(data.Take(4).ToArray());
+                var count = CytarConvert.ToInt32(data.SubBytes(4, 4));
                 var elementType = type.GetElementType();
                 var arr = Array.CreateInstance(elementType, count);
 

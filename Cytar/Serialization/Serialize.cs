@@ -13,15 +13,15 @@ namespace Cytar.Serialization
             if (obj is byte)
                 return new byte[] { (byte)obj };
             else if (obj is Int16 || obj is UInt16)
-                return CytarConvert.NumberToBytes(Convert.ToUInt16(obj));
+                return CytarConvert.ToBytes(Convert.ToUInt16(obj));
             else if (obj is Int32 || obj is UInt32)
-                return CytarConvert.NumberToBytes(Convert.ToUInt32(obj));
+                return CytarConvert.ToBytes(Convert.ToUInt32(obj));
             else if (obj is Int64 || obj is UInt64)
-                return CytarConvert.NumberToBytes(Convert.ToUInt64(obj));
+                return CytarConvert.ToBytes(Convert.ToUInt64(obj));
             else if (obj is float)
-                return CytarConvert.NumberToBytes(Convert.ToSingle(obj));
+                return CytarConvert.ToBytes(Convert.ToSingle(obj));
             else if (obj is double)
-                return CytarConvert.NumberToBytes(Convert.ToDouble(obj));
+                return CytarConvert.ToBytes(Convert.ToDouble(obj));
             else if (obj is char)
             {
                 var data = Encoding.UTF8.GetBytes(obj.ToString());
@@ -31,7 +31,7 @@ namespace Cytar.Serialization
             else if (obj is string)
             {
                 var data = Encoding.UTF8.GetBytes(obj as string);
-                return Combine(CytarConvert.NumberToBytes(data.Length), data);
+                return Combine(CytarConvert.ToBytes(data.Length), data);
             }
             else if (obj is Array)
             {
@@ -40,7 +40,7 @@ namespace Cytar.Serialization
                 {
                     dataList.Add(SerializeToBytes(slice));
                 }
-                dataList.Insert(0, CytarConvert.NumberToBytes(dataList.Count));
+                dataList.Insert(0, CytarConvert.ToBytes(dataList.Count));
                 var dataCombined = Combine(dataList.ToArray());
                 return dataCombined;
                 //return Combine(CytarConvert.NumberToBytes(dataCombined.Length), dataCombined);

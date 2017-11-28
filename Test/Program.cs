@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 using Cytar;
 
 namespace Test
@@ -15,8 +16,10 @@ namespace Test
             var root = new RootClass();
             root.Call("sub/output", "Hello world!");
             root.Call("rootFunc");
-            Cytar.Serialization.Serialize.SerializeToBytes(bill);
-
+            var data = Cytar.Serialization.Serialize.SerializeToBytes(bill);
+            MemoryStream ms = new MemoryStream(data);
+            CytarStreamReader cr = new CytarStreamReader(ms);
+            cr.ReadObject<Bill>();
             var serverRoot = new ServerRoot();
             var gate = new Gate();
             var hall = new Hall();
