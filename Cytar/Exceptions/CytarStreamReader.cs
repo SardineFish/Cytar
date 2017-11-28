@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 
 namespace Cytar.Exceptions
 {
@@ -11,11 +13,6 @@ namespace Cytar.Exceptions
         public CytarStreamReader(Stream stream)
         {
             Stream = stream;
-        }
-
-        public byte ReadByte()
-        {
-            return (byte)Stream.ReadByte();
         }
 
         public byte[] ReadBytes(int length)
@@ -32,35 +29,23 @@ namespace Cytar.Exceptions
             return buffer;
         }
 
-        public Int16 ReadInt16()
-        {
-            return CytarConvert.BytesToInt16(ReadBytes(2));
-        }
+        public byte ReadByte() => ReadBytes(1)[0];
 
-        public UInt16 ReadUInt16()
-        {
-            return (UInt16)CytarConvert.BytesToInt16(ReadBytes(2));
-        }
+        public Int16 ReadInt16() => CytarConvert.BytesToInt16(ReadBytes(2));
 
-        public Int32 ReadInt32()
-        {
-            return CytarConvert.BytesToInt32(ReadBytes(4));
-        }
+        public UInt16 ReadUInt16() => (UInt16)CytarConvert.BytesToInt16(ReadBytes(2));
 
-        public UInt32 ReadUInt32()
-        {
-            return (UInt32)CytarConvert.BytesToInt32(ReadBytes(4));
-        }
+        public Int32 ReadInt32() => CytarConvert.BytesToInt32(ReadBytes(4));
 
-        public Int64 ReadInt64()
-        {
-            return CytarConvert.BytesToInt64(ReadBytes(4));
-        }
+        public UInt32 ReadUInt32() => (UInt32)CytarConvert.BytesToInt32(ReadBytes(4));
 
-        public UInt64 ReadUInt64()
-        {
-            return (UInt64)CytarConvert.BytesToInt64(ReadBytes(2));
-        }
+        public Int64 ReadInt64() => CytarConvert.BytesToInt64(ReadBytes(4));
+
+        public UInt64 ReadUInt64() => (UInt64)CytarConvert.BytesToInt64(ReadBytes(2));
+
+        public float ReadSingle() => CytarConvert.BytesToSingle(ReadBytes(4));
+
+        public double ReadDouble() => CytarConvert.BytesToDouble(ReadBytes(8));
 
         public char ReadChar()
         {
@@ -94,18 +79,74 @@ namespace Cytar.Exceptions
 
         public string ReadString()
         {
-            var size = CytarConvert.BytesToInt32(ReadBytes(4));
+            var size = ReadInt32();
             return Encoding.UTF8.GetString(ReadBytes(size));
+        }
+
+        public Array ReadArray(Type elementType)
+        {
+            var count = ReadInt32();
+            var array = Array.CreateInstance(elementType, count);
+            for(var i = 0; i < count; i++)
+                array.SetValue(ReadObject(elementType), i);
+            return array;
+        }
+
+        public T[] ReadArray<T>()
+        {
+            return (T[])ReadArray(typeof(T));
         }
 
         public object ReadObject(Type type)
         {
-            throw new NotImplementedException();
+
+            if (type == typeof(byte))
+                return ReadByte();
+            else if (type == typeof(UInt16))
+                return ReadUInt16();
+            else if (type == typeof(Int16))
+                return ReadInt16();
+            else if (type == typeof(UInt32))
+                return ReadUInt32();
+            else if (type == typeof(Int32))
+                return ReadInt32();
+            else if (type == typeof(UInt64))
+                return ReadUInt64();
+            else if (type == typeof(Int64))
+                return ReadInt64();
+            else if (type == typeof(Single))
+                return ReadSingle();
+            else if (type == typeof(Double))
+                return ReadDouble();
+            else if (type == typeof(char))
+                return ReadChar();
+            else if (type == typeof(string))
+                return ReadString();
+            else if (type.IsArray)
+                return ReadArray(type.GetElementType());
+
+            var members = type.GetMembers().Where(
+                       member => member.GetCustomAttributes(true).Where(
+                           attr => attr is SerializablePropertyAttribute).FirstOrDefault() != null)
+                           .OrderBy(
+                       member => (member.GetCustomAttributes(true).Where(
+                           attr => attr is SerializablePropertyAttribute).FirstOrDefault() as SerializablePropertyAttribute).Index).ToArray();
+            var obj = Activator.CreateInstance(type);
+            foreach (var mb in members)
+            {
+                if (mb.MemberType == MemberTypes.Field)
+                    (mb as FieldInfo).SetValue(obj, ReadObject((mb as FieldInfo).FieldType));
+                else if (mb.MemberType == MemberTypes.Property)
+                    (mb as PropertyInfo).SetValue(obj, ReadObject((mb as PropertyInfo).PropertyType));
+                else
+                    throw new DeserializeException("Type error.");
+            }
+            return obj;
         }
 
         public T ReadObject<T>()
         {
-            throw new NotImplementedException();
+            return (T)ReadObject(typeof(T));
         }
     }
 }

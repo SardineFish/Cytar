@@ -13,9 +13,7 @@ namespace Cytar.Serialization
             if (data.Length < 0)
                 throw new ArgumentException("No data.");
             if (type == typeof(byte))
-            {
                 return data[0];
-            }
             else if (type == typeof(UInt16))
                 return (UInt16)CytarConvert.BytesToInt16(data);
             else if (type == typeof(Int16))
