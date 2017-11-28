@@ -16,10 +16,8 @@ namespace Test
             var root = new RootClass();
             root.Call("sub/output", "Hello world!");
             root.Call("rootFunc");
-            var data = Cytar.Serialization.Serialize.SerializeToBytes(bill);
-            MemoryStream ms = new MemoryStream(data);
-            CytarStreamReader cr = new CytarStreamReader(ms);
-            cr.ReadObject<Bill>();
+            var data = Cytar.Serialization.CytarSerialize.Serialize(bill);
+            Cytar.Serialization.CytarDeserialize.Deserialize<Bill>(data);
             var serverRoot = new ServerRoot();
             var gate = new Gate();
             var hall = new Hall();

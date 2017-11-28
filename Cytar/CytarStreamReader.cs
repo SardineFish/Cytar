@@ -7,7 +7,7 @@ using System.Reflection;
 
 namespace Cytar
 {
-    public class CytarStreamReader
+    public class CytarStreamReader: IDisposable
     {
         public Stream Stream {get;set;}
         public CytarStreamReader(Stream stream)
@@ -149,6 +149,11 @@ namespace Cytar
         public T ReadObject<T>()
         {
             return (T)ReadObject(typeof(T));
+        }
+
+        public void Dispose()
+        {
+            ((IDisposable)Stream).Dispose();
         }
     }
 }

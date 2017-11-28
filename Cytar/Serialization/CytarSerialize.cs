@@ -6,9 +6,9 @@ using System.Linq;
 
 namespace Cytar.Serialization
 {
-    public static class Serialize
+    public static class CytarSerialize
     {
-        public static byte[] SerializeToBytes(object obj)
+        public static byte[] Serialize(object obj)
         {
             if (obj is byte)
                 return new byte[] { (byte)obj };
@@ -38,7 +38,7 @@ namespace Cytar.Serialization
                 var dataList = new List<byte[]>();
                 foreach(var slice in (obj as Array))
                 {
-                    dataList.Add(SerializeToBytes(slice));
+                    dataList.Add(Serialize(slice));
                 }
                 dataList.Insert(0, CytarConvert.ToBytes(dataList.Count));
                 var dataCombined = Combine(dataList.ToArray());
@@ -60,9 +60,9 @@ namespace Cytar.Serialization
                 foreach (var mb in members)
                 {
                     if (mb.MemberType == MemberTypes.Field)
-                        dataList.Add(SerializeToBytes((mb as FieldInfo).GetValue(obj)));
+                        dataList.Add(Serialize((mb as FieldInfo).GetValue(obj)));
                     else if (mb.MemberType == MemberTypes.Property)
-                        dataList.Add(SerializeToBytes((mb as PropertyInfo).GetValue(obj)));
+                        dataList.Add(Serialize((mb as PropertyInfo).GetValue(obj)));
                     else
                         throw new SerializeException("Type error.");
                 }
