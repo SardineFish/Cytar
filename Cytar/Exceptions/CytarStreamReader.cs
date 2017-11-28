@@ -18,46 +18,48 @@ namespace Cytar.Exceptions
             return (byte)Stream.ReadByte();
         }
 
+        public byte[] ReadBytes(int length)
+        {
+            byte[] buffer = new byte[length];
+            var left = length;
+            while (left > 0)
+            {
+                var count = Stream.Read(buffer, length - left, left);
+                if (count <= 0)
+                    throw new EndOfStreamException();
+                left -= count;
+            }
+            return buffer;
+        }
+
         public Int16 ReadInt16()
         {
-            byte[] buffer = new byte[2];
-            Stream.Read(buffer, 0, 2);
-            return CytarConvert.BytesToInt16(buffer);
+            return CytarConvert.BytesToInt16(ReadBytes(2));
         }
 
         public UInt16 ReadUInt16()
         {
-            byte[] buffer = new byte[2];
-            Stream.Read(buffer, 0, 2);
-            return (UInt16)CytarConvert.BytesToInt16(buffer);
+            return (UInt16)CytarConvert.BytesToInt16(ReadBytes(2));
         }
 
         public Int32 ReadInt32()
         {
-            byte[] buffer = new byte[4];
-            Stream.Read(buffer, 0, 4);
-            return CytarConvert.BytesToInt32(buffer);
+            return CytarConvert.BytesToInt32(ReadBytes(4));
         }
 
         public UInt32 ReadUInt32()
         {
-            byte[] buffer = new byte[4];
-            Stream.Read(buffer, 0, 4);
-            return (UInt32)CytarConvert.BytesToInt32(buffer);
+            return (UInt32)CytarConvert.BytesToInt32(ReadBytes(4));
         }
 
         public Int64 ReadInt64()
         {
-            byte[] buffer = new byte[8];
-            Stream.Read(buffer, 0, 8);
-            return CytarConvert.BytesToInt64(buffer);
+            return CytarConvert.BytesToInt64(ReadBytes(4));
         }
 
         public UInt64 ReadUInt64()
         {
-            byte[] buffer = new byte[8];
-            Stream.Read(buffer, 0, 8);
-            return (UInt64)CytarConvert.BytesToInt64(buffer);
+            return (UInt64)CytarConvert.BytesToInt64(ReadBytes(2));
         }
 
         public char ReadChar()
@@ -92,7 +94,8 @@ namespace Cytar.Exceptions
 
         public string ReadString()
         {
-
+            var size = CytarConvert.BytesToInt32(ReadBytes(4));
+            return Encoding.UTF8.GetString(ReadBytes(size));
         }
     }
 }

@@ -9,6 +9,7 @@ namespace Cytar.Serialization
     {
         public static object DeserializeFromBytes(Type type, byte[] data)
         {
+            throw new NotImplementedException();
             if (data.Length < 0)
                 throw new ArgumentException("No data.");
             if (type == typeof(byte))
@@ -57,7 +58,7 @@ namespace Cytar.Serialization
         }
         public static object DeserializeFromByte(Type type,byte[] data,int idx,out int length)
         {
-
+            throw new NotImplementedException();
         }
 
         public static T DeserializeFromBytes<T>(byte[] data)
