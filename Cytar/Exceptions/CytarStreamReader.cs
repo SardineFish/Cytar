@@ -97,5 +97,15 @@ namespace Cytar.Exceptions
             var size = CytarConvert.BytesToInt32(ReadBytes(4));
             return Encoding.UTF8.GetString(ReadBytes(size));
         }
+
+        public object ReadObject(Type type)
+        {
+            throw new NotImplementedException();
+        }
+
+        public T ReadObject<T>()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

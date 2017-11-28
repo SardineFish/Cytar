@@ -25,7 +25,8 @@ namespace Cytar.Serialization
             else if (obj is char)
             {
                 var data = Encoding.UTF8.GetBytes(obj.ToString());
-                return Combine(CytarConvert.NumberToBytes((byte)data.Length), data);
+                return data;
+                //return Combine(CytarConvert.NumberToBytes((byte)data.Length), data);
             }
             else if (obj is string)
             {
@@ -41,7 +42,8 @@ namespace Cytar.Serialization
                 }
                 dataList.Insert(0, CytarConvert.NumberToBytes(dataList.Count));
                 var dataCombined = Combine(dataList.ToArray());
-                return Combine(CytarConvert.NumberToBytes(dataCombined.Length), dataCombined);
+                return dataCombined;
+                //return Combine(CytarConvert.NumberToBytes(dataCombined.Length), dataCombined);
             }
             else
             {
@@ -49,17 +51,24 @@ namespace Cytar.Serialization
                 if (obj == null)
                     return new byte[] { 0 };
                 var dataList = new List<byte[]>();
-                var properties = obj.GetType().GetProperties().Where(
-                    property => property.GetCustomAttributes(true).Where(
+                var members = obj.GetType().GetMembers().Where(
+                    member => member.GetCustomAttributes(true).Where(
                         attr => attr is SerializablePropertyAttribute).FirstOrDefault() != null)
                         .OrderBy(
-                    property => (property.GetCustomAttributes(true).Where(
+                    member => (member.GetCustomAttributes(true).Where(
                         attr => attr is SerializablePropertyAttribute).FirstOrDefault() as SerializablePropertyAttribute).Index).ToArray();
-                foreach (var prop in properties)
+                foreach (var mb in members)
                 {
-                    dataList.Add(SerializeToBytes(prop.GetValue(obj)));
+                    if (mb.MemberType == MemberTypes.Field)
+                        dataList.Add(SerializeToBytes((mb as FieldInfo).GetValue(obj)));
+                    else if (mb.MemberType == MemberTypes.Property)
+                        dataList.Add(SerializeToBytes((mb as PropertyInfo).GetValue(obj)));
+                    else
+                        throw new SerializeException("Type error.");
                 }
-                var fields = obj.GetType().GetFields().Where(
+                return Combine(dataList.ToArray());
+
+                /*var fields = obj.GetType().GetFields().Where(
                     field => field.GetCustomAttributes(true).Where(
                         attr => attr is SerializablePropertyAttribute).FirstOrDefault() != null)
                         .OrderBy(
@@ -70,7 +79,7 @@ namespace Cytar.Serialization
                     dataList.Add(SerializeToBytes(field.GetValue(obj)));
                 }
                 dataList.Insert(0, CytarConvert.NumberToBytes(dataList.Count));
-                return Combine(dataList.ToArray());
+                return Combine(dataList.ToArray());*/
             }
         }
         static byte[] Combine(params object[] data)
