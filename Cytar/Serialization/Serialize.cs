@@ -25,7 +25,7 @@ namespace Cytar.Serialization
             else if (obj is char)
             {
                 var data = Encoding.UTF8.GetBytes(obj.ToString());
-                return Combine(CytarConvert.NumberToBytes(data.Length), data);
+                return Combine(CytarConvert.NumberToBytes((byte)data.Length), data);
             }
             else if (obj is string)
             {
@@ -40,7 +40,8 @@ namespace Cytar.Serialization
                     dataList.Add(SerializeToBytes(slice));
                 }
                 dataList.Insert(0, CytarConvert.NumberToBytes(dataList.Count));
-                return Combine(dataList.ToArray());
+                var dataCombined = Combine(dataList.ToArray());
+                return Combine(CytarConvert.NumberToBytes(dataCombined.Length), dataCombined);
             }
             else
             {
@@ -68,6 +69,7 @@ namespace Cytar.Serialization
                 {
                     dataList.Add(SerializeToBytes(field.GetValue(obj)));
                 }
+                dataList.Insert(0, CytarConvert.NumberToBytes(dataList.Count));
                 return Combine(dataList.ToArray());
             }
         }
