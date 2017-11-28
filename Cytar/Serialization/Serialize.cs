@@ -66,6 +66,8 @@ namespace Cytar.Serialization
                     else
                         throw new SerializeException("Type error.");
                 }
+                // Add a symbol to indicate not null
+                dataList.Insert(0, new byte[] { 1 });
                 return Combine(dataList.ToArray());
 
                 /*var fields = obj.GetType().GetFields().Where(

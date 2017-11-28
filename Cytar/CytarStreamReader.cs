@@ -39,9 +39,9 @@ namespace Cytar
 
         public UInt32 ReadUInt32() => CytarConvert.ToUInt32(ReadBytes(4));
 
-        public Int64 ReadInt64() => CytarConvert.ToInt64(ReadBytes(4));
+        public Int64 ReadInt64() => CytarConvert.ToInt64(ReadBytes(8));
 
-        public UInt64 ReadUInt64() => CytarConvert.ToUInt64(ReadBytes(2));
+        public UInt64 ReadUInt64() => CytarConvert.ToUInt64(ReadBytes(8));
 
         public float ReadSingle() => CytarConvert.ToSingle(ReadBytes(4));
 
@@ -125,6 +125,8 @@ namespace Cytar
             else if (type.IsArray)
                 return ReadArray(type.GetElementType());
 
+            if (ReadByte() == 0)
+                return null;
             var members = type.GetMembers().Where(
                        member => member.GetCustomAttributes(true).Where(
                            attr => attr is SerializablePropertyAttribute).FirstOrDefault() != null)
