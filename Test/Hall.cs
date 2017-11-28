@@ -9,13 +9,13 @@ namespace Test
 {
     public class Hall: APIContext
     {
-        [CytarAPI("GTRM")]
+        [CytarAPIAttribute("GTRM")]
         public string[] GetRooms(Session session)
         {
             throw new NotImplementedException();
         }
 
-        [CytarAPI("CRRM")]
+        [CytarAPIAttribute("CRRM")]
         public int CreateGameRoom(Session session)
         {
             throw new NotImplementedException();

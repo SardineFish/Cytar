@@ -17,9 +17,9 @@ namespace Cytar
         AttributeTargets.Struct, 
         Inherited = false, 
         AllowMultiple = false)]
-    public class CytarAPI : Routable
+    public class CytarAPIAttribute : Routable
     {
-        public CytarAPI(string name): base(name)
+        public CytarAPIAttribute(string name): base(name)
         {
         }
         

@@ -9,7 +9,7 @@ namespace Test
 {
     public class APITest: APIContext
     {
-        [CytarAPI("Foo")]
+        [CytarAPIAttribute("Foo")]
         public int Foo(int x)
         {
             return -x;

@@ -9,7 +9,7 @@ namespace Test
 {
     public class Shelf: APIContext
     {
-        [CytarAPI("GetIt")]
+        [CytarAPIAttribute("GetIt")]
         public int TakeIt(int x)
         {
             return x * 10;

@@ -9,12 +9,12 @@ namespace Test
 {
     public class Gate: APIContext
     {
-        [CytarAPI("LGN")]
+        [CytarAPIAttribute("LGN")]
         public void Login(Session session, string username,byte[] pwdHash)
         {
         }
 
-        [CytarAPI("REG")]
+        [CytarAPIAttribute("REG")]
         public void Register(Session session, string username,byte[] pwdHash)
         {
 

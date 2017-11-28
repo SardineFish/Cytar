@@ -9,14 +9,17 @@ using EasyRoute;
 
 namespace Cytar
 {
-    public class Session: RoutableObject, IDObject
+    public class Session: RoutableObject, IDObject, IAPIContext
     {
+        public const string ErrorHandlerAPI = "__ERR";
         public virtual NetworkSession NetworkSession { get; protected set; }
         public virtual Thread HandleThread { get; protected set; }
 
         public virtual List<APIContext> APIContext { get; protected set; }
 
         public virtual APIContext RootContext { get; set; }
+
+        public virtual event Action<Session, string> Error;
 
         public uint ID { get; internal set; }
 
@@ -72,7 +75,7 @@ namespace Cytar
         {
             var apiMethods = this.GetType().GetMethods().Where(
                         method => method.GetCustomAttributes(true).Where(
-                                attr => attr is CytarAPI && (attr as CytarAPI).Name == apiName).FirstOrDefault() != null)
+                                attr => attr is CytarAPIAttribute && (attr as CytarAPIAttribute).Name == apiName).FirstOrDefault() != null)
                                     .ToArray();
             if (apiMethods.Length <= 0)
             {
@@ -99,6 +102,43 @@ namespace Cytar
             }
         }
 
+        public virtual object CallAPI(string apiName)
+        {
+            try
+            {
+                var api = GetAPI(apiName);
+                var paramsList = new List<object>();
+                CytarStreamReader cr = new CytarStreamReader(NetworkSession.Stream);
+                foreach(var paramType in api.Parameters)
+                {
+                    paramsList.Add(cr.ReadObject(paramType));
+                }
+                return api.Method.Invoke(api.APIContext, paramsList.ToArray());
+            }
+            catch (Exception ex)
+            {
+                CallRemoteAPI(ErrorHandlerAPI, ex.Message);
+                return null;
+            }
+        }
+
+        public virtual void CallRemoteAPI(string apiName,params object[] param)
+        {
+
+        }
+
+        public virtual void APIReturn(int cid,params object[] param)
+        {
+
+        }
+
+        [CytarAPI(ErrorHandlerAPI)]
+        public virtual void OnError(string message)
+        {
+            if (Error != null)
+                Error.Invoke(this, message);
+        }
+
         public virtual object CallPathAPI(string path,params object[] param)
         {
             if (path.StartsWith("/"))
@@ -118,6 +158,88 @@ namespace Cytar
             catch (UnreachableException)
             {
                 throw new APINotFoundException(path);
+            }
+        }
+
+
+        public APIInfo GetPathAPI(string path)
+        {
+            var pathList = path.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            if (pathList.Length <= 0)
+                throw new ArgumentException("Invalid path.");
+            else if (pathList.Length == 1)
+            {
+                var method = GetMethod(pathList[0]);
+                return new APIInfo(this, method);
+            }
+            else
+            {
+                var subPath = pathList[1];
+                for (var i = 2; i < pathList.Length; i++)
+                    subPath += "/" + pathList[i];
+
+                try
+                {
+                    var property = GetProperty(pathList[0]);
+                    if (property != null)
+                    {
+                        if (!property.DeclaringType.IsSubclassOf(typeof(APIContext)))
+                            throw new APINotFoundException(path);
+
+                        return (property.GetValue(this) as APIContext).GetPathAPI(subPath);
+                    }
+                }
+                catch (MemberNotFoundException)
+                {
+
+                }
+
+
+                var field = GetField(pathList[0]);
+                if (field != null)
+                {
+                    if (!field.DeclaringType.IsSubclassOf(typeof(APIContext)))
+                        throw new APINotFoundException(path);
+                    return (field.GetValue(this) as APIContext).GetPathAPI(subPath);
+                }
+
+                throw new MemberNotFoundException(this, pathList[0]);
+            }
+        }
+
+        public APIInfo GetAPI(string apiName)
+        {
+            if (apiName.Contains("/"))
+            {
+                return GetPathAPI(apiName);
+            }
+
+            var apiMethods = this.GetType().GetMethods().Where(
+                        method => method.GetCustomAttributes(true).Where(
+                                attr => attr is CytarAPIAttribute && (attr as CytarAPIAttribute).Name == apiName).FirstOrDefault() != null)
+                                    .ToArray();
+            if (apiMethods.Length <= 0)
+            {
+                foreach (var context in APIContext)
+                {
+                    try
+                    {
+                        return context.GetAPI(apiName);
+                    }
+                    catch (APINotFoundException)
+                    {
+                        continue;
+                    }
+                    catch (Exception ex)
+                    {
+                        throw ex;
+                    }
+                }
+                throw new APINotFoundException(apiName);
+            }
+            else
+            {
+                return new APIInfo(this, apiMethods[0]);
             }
         }
     }

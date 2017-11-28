@@ -9,7 +9,7 @@ namespace Test
 {
     public class ServerRoot: Cytar.APIContext
     {
-        [CytarAPI("ETMK")]
+        [CytarAPIAttribute("ETMK")]
         public void EnterMarket()
         {
 

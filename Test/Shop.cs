@@ -9,14 +9,14 @@ namespace Test
 {
     public class Shop:APIContext
     {
-        [CytarAPI("fruit")]
+        [CytarAPIAttribute("fruit")]
         public Shelf FruitsShelf = new Shelf();
-        [CytarAPI("books")]
+        [CytarAPIAttribute("books")]
         public Shelf BooksShelf = new Shelf();
-        [CytarAPI("meat")]
+        [CytarAPIAttribute("meat")]
         public Shelf MeatShelf = new Shelf();
 
-        [CytarAPI("TTCst")]
+        [CytarAPIAttribute("TTCst")]
         public int TotalCost(int[] goods)
         {
             int sum = 0;
@@ -25,7 +25,7 @@ namespace Test
             return sum;
         }
 
-        [CytarAPI("Pay")]
+        [CytarAPIAttribute("Pay")]
         public void Pay(int money)
         {
 

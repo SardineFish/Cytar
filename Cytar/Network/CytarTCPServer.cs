@@ -45,6 +45,7 @@ namespace Cytar.Network
                     port = value;
                 else
                     throw new Exception("Invalid action.");
+                
             }
         }
 
