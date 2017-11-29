@@ -37,7 +37,7 @@ namespace Cytar
 
         public void OnError(RemoteException exception)
         {
-            ReturnCallback?.Invoke(exception);
+            ErrorCallback?.Invoke(exception);
         }
 
     }

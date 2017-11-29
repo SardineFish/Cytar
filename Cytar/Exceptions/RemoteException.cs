@@ -15,5 +15,6 @@ namespace Cytar
             ErrorCode = errorCode;
             Message = msg;
         }
+        public RemoteException() : this("", -1) { }
     }
 }
