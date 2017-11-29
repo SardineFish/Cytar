@@ -26,16 +26,25 @@ namespace Test
 
             var shop = new Shop();
             var bag = new List<int>();
-            var man = new Session();
-            man.RootContext = shop;
-            bag.Add((int)man.CallPathAPI("/fruit/GetIt", 10));
-            man.Join(shop.FruitsShelf);
-            bag.Add((int)man.CallAPI("GetIt", 5));
-            man.Join(shop.MeatShelf);
-            bag.Add((int)man.CallAPI("GetIt", 5));
+            var remoteSession = new Session(new TestNetworkSession());
+            var localSession = new Session(new TestNetworkSession());
+
+            remoteSession.RootContext = shop;
+            remoteSession.Join(shop.FruitsShelf);
+
+            localSession.CallRemoteAPI<int>(
+                "GetIt",
+                (cost) =>
+                {
+                    bag.Add((int)cost);
+                },
+                (error) =>
+                {
+                }, 
+                5);
             //Total Cost
-            var money = (int)man.CallAPI("TTCst", bag.ToArray());
-            man.CallAPI("Pay", money);
+            var money = (int)remoteSession.CallAPI("TTCst", bag.ToArray());
+            remoteSession.CallAPI("Pay", money);
 
         }
     }

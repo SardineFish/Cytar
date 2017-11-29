@@ -51,6 +51,8 @@
     <Compile Include="ServerRoot.cs" />
     <Compile Include="Shelf.cs" />
     <Compile Include="Shop.cs" />
+    <Compile Include="TestNetworkSession.cs" />
+    <Compile Include="TestStream.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

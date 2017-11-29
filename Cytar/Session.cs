@@ -65,9 +65,13 @@ namespace Cytar
                 {
                     HandlePackage(ReadPackage(PackageSizeLimit));
                 }
-                catch (Exception ex)
+                catch (IOException)
                 {
 
+                }
+                catch (Exception ex)
+                {
+                    Error?.Invoke(this, ex.Message);
                 }
             }
         }
@@ -131,7 +135,11 @@ namespace Cytar
         {
             lock (NetworkSession.OutputStream)
             {
-                sourceStream.CopyTo(NetworkSession.OutputStream);
+                CytarStreamReader cr = new CytarStreamReader(sourceStream);
+                CytarStreamWriter cw = new CytarStreamWriter(NetworkSession.OutputStream);
+                cw.Write(sourceStream.Length);
+                cw.Write(cr.ReadBytes((int)sourceStream.Length));
+                //sourceStream.CopyTo(NetworkSession.OutputStream);
             }
         }
 
