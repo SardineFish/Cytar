@@ -6,6 +6,7 @@ using System.IO;
 using System.Threading;
 using System.Linq;
 using EasyRoute;
+using Cytar.IO;
 
 namespace Cytar
 {
@@ -49,9 +50,24 @@ namespace Cytar
             }
         }
 
-        public virtual byte[] ReadPackage()
+        public virtual byte[] ReadPackage(int sizeLimit = int.MaxValue)
         {
-            throw new NotImplementedException();
+            lock (NetworkSession.InputStream)
+            {
+                CytarStreamReader cr = new CytarStreamReader(NetworkSession.InputStream);
+                var size = cr.ReadInt32();
+                if (size > sizeLimit)
+                    throw new DataSizeException(sizeLimit, size);
+                return cr.ReadBytes(size);
+            }
+        }
+
+        public virtual void SendPackage(byte[] data)
+        {
+            lock (NetworkSession.OutputStream)
+            {
+                
+            }
         }
 
 

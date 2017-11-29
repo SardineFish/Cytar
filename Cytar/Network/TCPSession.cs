@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using System.Net;
 using System.Net.Sockets;
+using Cytar.IO;
 
 namespace Cytar.Network
 {
@@ -21,43 +22,50 @@ namespace Cytar.Network
         }
 
         public override bool SSID { get; protected set; }
-        
-        public override Stream Stream
-        {
-            get
-            {
-                if (TcpClient == null)
-                    return null;
-                return TcpClient.GetStream();
-            }
-            protected set { }
-        }
 
         public TcpClient TcpClient { get; private set; }
+        protected override Stream InnerStream { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public override InputStream InputStream { get => throw new NotImplementedException(); protected set => throw new NotImplementedException(); }
+        public override OutputStream OutputStream { get => throw new NotImplementedException(); protected set => throw new NotImplementedException(); }
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-            return Stream.Read(buffer, offset, count);
+            lock (InputStream)
+            {
+                return InputStream.Read(buffer, offset, count);
+            }
         }
 
         public override void Write(byte[] buffer, int offset, int count)
         {
-            Stream.Write(buffer, offset, count);
+            lock (OutputStream)
+            {
+                OutputStream.Write(buffer, offset, count);
+            }
         }
 
         public override int ReadByte()
         {
-            return Stream.ReadByte();
+            lock (InputStream)
+            {
+                return InputStream.ReadByte();
+            }
         }
 
         public override void WriteByte(byte value)
         {
-            Stream.WriteByte(value);
+            lock (OutputStream)
+            {
+                OutputStream.WriteByte(value);
+            }
         }
 
         public TCPSession(TcpClient client)
         {
             TcpClient = client;
+            InnerStream = client.GetStream();
+            InputStream = new InputStream(InnerStream);
+            OutputStream = new OutputStream(InnerStream);
         }
     }
 }

@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading;
 using System.Net;
 using System.IO;
+using Cytar.IO;
 
 namespace Cytar.Network
 {
@@ -12,8 +13,11 @@ namespace Cytar.Network
         public abstract bool Connected { get; protected set; }
         public abstract bool SSID { get; protected set; }
 
-        public abstract Stream Stream { get; protected set; }
+        protected abstract Stream InnerStream { get; set; }
 
+        public abstract InputStream InputStream { get; protected set; }
+
+        public abstract OutputStream OutputStream { get; protected set; }
 
         public abstract int Read(byte[] buffer, int idx, int count);
 

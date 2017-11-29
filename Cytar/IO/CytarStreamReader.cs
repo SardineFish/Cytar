@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 
-namespace Cytar
+namespace Cytar.IO
 {
     public class CytarStreamReader: IDisposable
     {

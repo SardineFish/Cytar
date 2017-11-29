@@ -3,12 +3,25 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace Cytar.Network
+namespace Cytar.IO
 {
-    public class OutputStream: Stream
+    public class InputStream : Stream
     {
+        public InputStream(Stream innerStream)
+        {
+            this.innerStream = innerStream ?? throw new ArgumentNullException(nameof(innerStream));
+        }
+
         private Stream innerStream { get; set; }
-        public override bool CanRead => false;
+        public override bool CanRead
+        {
+            get
+            {
+                if (innerStream == null)
+                    return false;
+                return true;
+            }
+        }
 
         public override bool CanSeek => innerStream.CanSeek;
 
@@ -24,12 +37,12 @@ namespace Cytar.Network
 
         public override void Flush() => innerStream.Flush();
 
-        public override int Read(byte[] buffer, int offset, int count) => throw new IOException("WriteOnly");
+        public override int Read(byte[] buffer, int offset, int count) => innerStream.Read(buffer, offset, count);
 
         public override long Seek(long offset, SeekOrigin origin) => innerStream.Seek(offset, origin);
 
         public override void SetLength(long value) => innerStream.SetLength(value);
 
-        public override void Write(byte[] buffer, int offset, int count) => innerStream.Write(buffer, offset, count);
+        public override void Write(byte[] buffer, int offset, int count) => throw new IOException("ReadOnly");
     }
 }
