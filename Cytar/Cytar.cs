@@ -20,6 +20,10 @@ namespace Cytar
 
         internal Func<NetworkSession, Session> SetupSessionCallback;
 
+        internal Action<Session> WaitSessionCallback;
+
+        private ObjectWaiter<Session> SessionWaiter = new ObjectWaiter<Session>();
+
         public Cytar()
         {
             
@@ -27,7 +31,10 @@ namespace Cytar
 
         public void Start()
         {
-
+            TCPServer?.Start();
+            UDPServer?.Start();
+            HTTPServer?.Start();
+            WebSocketServer?.Start();
         }
 
         public void UseTCP(string host,int port)
@@ -79,26 +86,27 @@ namespace Cytar
             else
                 session = new Session(netSession);
             session.Start();
+            SessionWaiter.Release(session);
         }
 
         public Session WaitSession()
         {
-            throw new NotImplementedException();
+            return SessionWaiter.Wait();
         }
 
         public void WaitSession(Action<Session> callback)
         {
-            throw new NotImplementedException();
+            callback?.Invoke(SessionWaiter.Wait());
         }
 
-        public SessionT WaitSession<SessionT>()
+        public SessionT WaitSession<SessionT>() where SessionT:Session
         {
-            throw new NotImplementedException();
+            return SessionWaiter.Wait() as SessionT;
         }
 
-        public void WaitSession<SessionT>(Action<SessionT> callback)
+        public void WaitSession<SessionT>(Action<SessionT> callback) where SessionT : Session
         {
-            throw new NotImplementedException();
+            callback?.Invoke(SessionWaiter.Wait() as SessionT);
         }
     }
     public enum Protocol : byte

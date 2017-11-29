@@ -23,6 +23,9 @@ namespace Test
             var hall = new Hall();
 
             Cytar.Cytar cytar = new Cytar.Cytar();
+            cytar.UseTCP("localhost", 36514);
+            cytar.Start();
+            
 
             var shop = new Shop();
             var bag = new List<int>();
