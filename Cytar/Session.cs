@@ -296,6 +296,12 @@ namespace Cytar
 
         public APIInfo GetPathAPI(string path)
         {
+            if (path.StartsWith("/"))
+            {
+                if (this.RootContext == null)
+                    throw new NoRootException(this);
+                return RootContext.GetPathAPI(path.Substring(1));
+            }
             var pathList = path.Split(new char[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
             if (pathList.Length <= 0)
                 throw new ArgumentException("Invalid path.");
