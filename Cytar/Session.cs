@@ -14,6 +14,20 @@ namespace Cytar
     {
         public const string ErrorHandlerAPI = "_ERR";
         public const string APIReturnHandlerAPI = "_RTN";
+
+        public Session(NetworkSession netSession) : this()
+        {
+            NetworkSession = netSession;
+            netSession.Session = this;
+        }
+
+        public Session()
+        {
+            APIContext = new List<APIContext>();
+            PackageSizeLimit = int.MaxValue;
+            RemoteCallingRecode = new Dictionary<int, RemoteAPIInfo>();
+        }
+
         public virtual NetworkSession NetworkSession { get; protected set; }
         public virtual Thread HandleThread { get; protected set; }
 
@@ -38,24 +52,37 @@ namespace Cytar
 
         public uint ID { get; internal set; }
 
-        public Session(NetworkSession netSession):this()
-        {
-            NetworkSession = netSession;
-            netSession.Session = this;
-        }
-
-        public Session()
-        {
-            APIContext = new List<APIContext>();
-            PackageSizeLimit = int.MaxValue;
-            RemoteCallingRecode = new Dictionary<int, RemoteAPIInfo>();
-        }
-
+        #region Public Methods
         public virtual void Start()
         {
             HandleThread = new Thread(StartHandle);
             HandleThread.Start();
         }
+        
+        public virtual void Join(APIContext context)
+        {
+            if (!context.Sessions.Contains(this))
+                context.Sessions.Add(this);
+            if (!APIContext.Contains(context))
+                APIContext.Add(context);
+        }
+
+        public virtual void Exit(APIContext context)
+        {
+            if (context.Sessions.Contains(this))
+                context.Sessions.Remove(this);
+            if (APIContext.Contains(context))
+                APIContext.Remove(context);
+        }
+
+        public virtual void Close(int errCode)
+        {
+
+        }
+
+        #endregion
+
+        #region Interact with network stream
 
         protected virtual void StartHandle()
         {
@@ -73,18 +100,6 @@ namespace Cytar
                 {
                     Error?.Invoke(this, ex.Message);
                 }
-            }
-        }
-
-        protected virtual byte[] ReadPackage(int sizeLimit = int.MaxValue)
-        {
-            lock (NetworkSession.InputStream)
-            {
-                CytarStreamReader cr = new CytarStreamReader(NetworkSession.InputStream);
-                var size = cr.ReadInt32();
-                if (size > sizeLimit)
-                    throw new DataSizeException(sizeLimit, size);
-                return cr.ReadBytes(size);
             }
         }
 
@@ -119,8 +134,19 @@ namespace Cytar
             }
         }
         
+        internal virtual byte[] ReadPackage(int sizeLimit = int.MaxValue)
+        {
+            lock (NetworkSession.InputStream)
+            {
+                CytarStreamReader cr = new CytarStreamReader(NetworkSession.InputStream);
+                var size = cr.ReadInt32();
+                if (size > sizeLimit)
+                    throw new DataSizeException(sizeLimit, size);
+                return cr.ReadBytes(size);
+            }
+        }
 
-        public virtual void SendPackage(byte[] data)
+        internal virtual void SendPackage(byte[] data)
         {
             lock (NetworkSession.OutputStream)
             {
@@ -131,7 +157,7 @@ namespace Cytar
             }
         }
 
-        public virtual void SendPackage(MemoryStream sourceStream)
+        internal virtual void SendPackage(MemoryStream sourceStream)
         {
             lock (NetworkSession.OutputStream)
             {
@@ -143,27 +169,9 @@ namespace Cytar
             }
         }
 
+        #endregion
 
-        public virtual void Join(APIContext context)
-        {
-            if (!context.Sessions.Contains(this))
-                context.Sessions.Add(this);
-            if (!APIContext.Contains(context))
-                APIContext.Add(context);
-        }
-
-        public virtual void Exit(APIContext context)
-        {
-            if (context.Sessions.Contains(this))
-                context.Sessions.Remove(this);
-            if (APIContext.Contains(context))
-                APIContext.Remove(context);
-        }
-
-        public virtual void Close(int errCode)
-        {
-
-        }
+        #region API Route
 
         public virtual object CallAPI(string apiName, params object[] param)
         {
@@ -208,69 +216,6 @@ namespace Cytar
             return (api.Method.Invoke(api.APIContext, paramsList.ToArray()), api.Method.ReturnType == typeof(void));
         }
 
-
-        public virtual void CallRemoteAPI(string apiName, Type returnType, Action<object> returnCallback, Action<RemoteException> errorCallback, params object[] param)
-        {
-            var callingID = NextCallingID;
-
-            RemoteAPIInfo remoteAPI = new RemoteAPIInfo(apiName, callingID, returnType, returnCallback, errorCallback);
-            RemoteCallingRecode.Add(remoteAPI.CallingID, remoteAPI);
-            MemoryStream ms = new MemoryStream();
-            CytarStreamWriter cw = new CytarStreamWriter(ms);
-            cw.Write(callingID);
-            cw.Write(apiName);
-            foreach (var arg in param)
-            {
-                cw.Write(arg);
-            }
-            ms.Position = 0;
-            SendPackage(ms);
-        }
-        public virtual void CallRemoteAPI<T>(string apiName, Action<object> returnCallback, Action<RemoteException> errorCallback, params object[] param)
-        {
-            CallRemoteAPI(apiName, typeof(T), returnCallback, errorCallback, param);
-        }
-        public virtual void CallRemoteAPI(string apiName, Type returnType, Action<object> callback, params object[] param)
-        {
-            CallRemoteAPI(apiName, returnType, callback, null, param);
-        }
-        public virtual void CallRemoteAPI<T>(string apiName, Action<T> callback, params object[] param)
-        {
-            CallRemoteAPI(apiName, typeof(T), callback, null, param);
-        }
-
-        public virtual void CallRemoteAPI(string apiName, Type returnType, params object[] param)
-        {
-            CallRemoteAPI(apiName, returnType, null, null, param);
-        }
-        public virtual void CallRemoteAPI<T>(string apiName, params object[] param)
-        {
-            CallRemoteAPI(apiName, typeof(T), null, null, param);
-        }
-        public virtual void CallRemoteAPI(string apiName,params object[] param)
-        {
-            CallRemoteAPI(apiName, typeof(void), null, null, param);
-        }
-
-        [CytarAPI(APIReturnHandlerAPI)]
-        public virtual void OnAPIReturn(int cid, Stream returnStream)
-        {
-            if (!RemoteCallingRecode.ContainsKey(cid))
-                return;
-            CytarStreamReader cr = new CytarStreamReader(returnStream);
-            RemoteCallingRecode[cid].Return(cr.ReadObject(RemoteCallingRecode[cid].ReturnType));
-            RemoteCallingRecode.Remove(cid);
-        }
-
-        [CytarAPI(ErrorHandlerAPI)]
-        public virtual void OnError(int cid, RemoteException exception)
-        {
-            if (!RemoteCallingRecode.ContainsKey(cid))
-                return;
-            RemoteCallingRecode[cid].OnError(exception);
-            RemoteCallingRecode.Remove(cid);
-        }
-
         public virtual object CallPathAPI(string path,params object[] param)
         {
             if (path.StartsWith("/"))
@@ -292,8 +237,7 @@ namespace Cytar
                 throw new APINotFoundException(path);
             }
         }
-
-
+        
         public APIInfo GetPathAPI(string path)
         {
             if (path.StartsWith("/"))
@@ -379,6 +323,74 @@ namespace Cytar
             {
                 return new APIInfo(this, apiMethods[0]);
             }
+        }
+
+        #endregion 
+        
+        #region Call Remote API
+
+        public virtual void CallRemoteAPI(string apiName, Type returnType, Action<object> returnCallback, Action<RemoteException> errorCallback, params object[] param)
+        {
+            var callingID = NextCallingID;
+
+            RemoteAPIInfo remoteAPI = new RemoteAPIInfo(apiName, callingID, returnType, returnCallback, errorCallback);
+            RemoteCallingRecode.Add(remoteAPI.CallingID, remoteAPI);
+            MemoryStream ms = new MemoryStream();
+            CytarStreamWriter cw = new CytarStreamWriter(ms);
+            cw.Write(callingID);
+            cw.Write(apiName);
+            foreach (var arg in param)
+            {
+                cw.Write(arg);
+            }
+            ms.Position = 0;
+            SendPackage(ms);
+        }
+        public virtual void CallRemoteAPI<T>(string apiName, Action<object> returnCallback, Action<RemoteException> errorCallback, params object[] param)
+        {
+            CallRemoteAPI(apiName, typeof(T), returnCallback, errorCallback, param);
+        }
+        public virtual void CallRemoteAPI(string apiName, Type returnType, Action<object> callback, params object[] param)
+        {
+            CallRemoteAPI(apiName, returnType, callback, null, param);
+        }
+        public virtual void CallRemoteAPI<T>(string apiName, Action<T> callback, params object[] param)
+        {
+            CallRemoteAPI(apiName, typeof(T), callback, null, param);
+        }
+        
+        public virtual void CallRemoteAPI(string apiName, Type returnType, params object[] param)
+        {
+            CallRemoteAPI(apiName, returnType, null, null, param);
+        }
+        public virtual void CallRemoteAPI<T>(string apiName, params object[] param)
+        {
+            CallRemoteAPI(apiName, typeof(T), null, null, param);
+        }
+        public virtual void CallRemoteAPI(string apiName, params object[] param)
+        {
+            CallRemoteAPI(apiName, typeof(void), null, null, param);
+        }
+
+        #endregion
+
+        [CytarAPI(APIReturnHandlerAPI)]
+        public virtual void OnAPIReturn(int cid, Stream returnStream)
+        {
+            if (!RemoteCallingRecode.ContainsKey(cid))
+                return;
+            CytarStreamReader cr = new CytarStreamReader(returnStream);
+            RemoteCallingRecode[cid].Return(cr.ReadObject(RemoteCallingRecode[cid].ReturnType));
+            RemoteCallingRecode.Remove(cid);
+        }
+
+        [CytarAPI(ErrorHandlerAPI)]
+        public virtual void OnError(int cid, RemoteException exception)
+        {
+            if (!RemoteCallingRecode.ContainsKey(cid))
+                return;
+            RemoteCallingRecode[cid].OnError(exception);
+            RemoteCallingRecode.Remove(cid);
         }
     }
 }
