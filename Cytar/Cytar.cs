@@ -23,6 +23,7 @@ namespace Cytar
         internal Action<Session> WaitSessionCallback;
 
         private ObjectWaiter<Session> SessionWaiter = new ObjectWaiter<Session>();
+        
 
         public Cytar()
         {
@@ -87,6 +88,7 @@ namespace Cytar
                 session = new Session(netSession);
             session.Start();
             SessionWaiter.Release(session);
+            WaitSessionCallback?.Invoke(session);
         }
 
         public Session WaitSession()
@@ -96,7 +98,7 @@ namespace Cytar
 
         public void WaitSession(Action<Session> callback)
         {
-            callback?.Invoke(SessionWaiter.Wait());
+            WaitSessionCallback = callback;
         }
 
         public SessionT WaitSession<SessionT>() where SessionT:Session
@@ -106,7 +108,10 @@ namespace Cytar
 
         public void WaitSession<SessionT>(Action<SessionT> callback) where SessionT : Session
         {
-            callback?.Invoke(SessionWaiter.Wait() as SessionT);
+            WaitSessionCallback = (session) =>
+            {
+                callback(session as SessionT);
+            };
         }
     }
     public enum Protocol : byte

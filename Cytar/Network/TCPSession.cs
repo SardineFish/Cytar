@@ -24,9 +24,9 @@ namespace Cytar.Network
         public override bool SSID { get; protected set; }
 
         public TcpClient TcpClient { get; private set; }
-        protected override Stream InnerStream { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public override InputStream InputStream { get => throw new NotImplementedException(); protected set => throw new NotImplementedException(); }
-        public override OutputStream OutputStream { get => throw new NotImplementedException(); protected set => throw new NotImplementedException(); }
+        protected override Stream InnerStream { get; set; }
+        public override InputStream InputStream { get ; protected set; }
+        public override OutputStream OutputStream { get; protected set; }
 
         public override int Read(byte[] buffer, int offset, int count)
         {

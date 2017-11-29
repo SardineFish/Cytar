@@ -81,10 +81,17 @@ namespace Cytar.Network
 
                 TcpListener = new TcpListener(addr[0], Port);
                 TcpListener.Start();
-                while (Running)
+                while (true)
                 {
-                    var client = TcpListener.AcceptTcpClient();
-                    Cytar.SetupSession(new TCPSession(client));
+                    try
+                    {
+                        var client = TcpListener.AcceptTcpClient();
+                        Cytar.SetupSession(new TCPSession(client));
+                    }
+                    catch(SocketException)
+                    {
+                        return;
+                    }
                 }
             }
             catch (Exception ex)

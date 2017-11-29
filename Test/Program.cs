@@ -21,69 +21,65 @@ namespace Test
             var serverRoot = new ServerRoot();
             var gate = new Gate();
             var hall = new Hall();
-
-            Cytar.Cytar cytar = new Cytar.Cytar();
-            cytar.UseTCP("localhost", 36514);
-            cytar.Start();
             
 
             var shop = new Shop();
             var bag = new List<int>();
-            TestStream local_remote = new TestStream();
-            TestStream remote_local = new TestStream();
-            var remoteSession = new Session(new TestNetworkSession(local_remote, remote_local));
-            var localSession = new Session(new TestNetworkSession(remote_local, local_remote));
 
-            remoteSession.RootContext = shop;
-            remoteSession.Join(shop.FruitsShelf);
-            remoteSession.Start();
-            localSession.Start();
+            Cytar.Cytar cytar = new Cytar.Cytar();
+            cytar.UseTCP("127.0.0.1", 36514);
+            cytar.Start();
+            cytar.WaitSession((session) =>
+            {
+                session.RootContext = shop;
+                session.Join(shop.FruitsShelf);
+            });
+            CytarClient client = new CytarClient(Protocol.TCP, "127.0.0.1", 36514);
+            client.Connect();
 
-            localSession.CallRemoteAPI<int>(
+            client.Session.CallRemoteAPI<int>(
                 "GetIt",
                 (cost) =>
                 {
                     bag.Add((int)cost);
+                    Console.WriteLine(cost);
+                    client.Session.CallRemoteAPI<int>(
+                        "/books/GetIt",
+                        (bookCost) =>
+                        {
+                            bag.Add((int)bookCost);
+                            Console.WriteLine(bookCost);
+                            client.Session.CallRemoteAPI<int>("TTCst",
+                                (totalCost) =>
+                                {
+                                    Console.WriteLine(totalCost);
+                                },
+                                (error) =>
+                                {
+                                    Console.WriteLine(error.Message);
+                                },
+                                bag.ToArray());
+                        },
+                        (error) =>
+                        {
+                            Console.WriteLine(error.Message);
+                        }, 100);
                 },
                 (error) =>
                 {
                 }, 
                 5);
-            localSession.CallRemoteAPI<int>(
-                "/books/GetIt",
-                (cost) =>
-                {
-                    bag.Add((int)cost);
-                },
-                (error) =>
-                {
-                    Console.WriteLine(error.Message);
-                }, 100);
-            localSession.CallRemoteAPI<int>(
+            client.Session.CallRemoteAPI<int>(
                 "/apple/GetIt",
                 (cost) =>
                 {
                     bag.Add((int)cost);
+
                 },
                 (error) =>
                 {
                     Console.WriteLine(error.Message);
                 }, 100);
-
-            localSession.CallRemoteAPI<int>(
-                "EatIt",
-                (cost) =>
-                {
-                    bag.Add((int)cost);
-                },
-                (error) =>
-                {
-                    Console.WriteLine(error.Message);
-                }, 100);
-
-            //Total Cost
-            var money = (int)remoteSession.CallAPI("TTCst", bag.ToArray());
-            remoteSession.CallAPI("Pay", money);
 
         }
     }
