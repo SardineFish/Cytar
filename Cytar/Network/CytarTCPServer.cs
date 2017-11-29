@@ -84,6 +84,7 @@ namespace Cytar.Network
                 while (Running)
                 {
                     var client = TcpListener.AcceptTcpClient();
+                    Cytar.SetupSession(new TCPSession(client));
                 }
             }
             catch (Exception ex)

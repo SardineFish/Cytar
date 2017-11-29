@@ -71,12 +71,14 @@ namespace Cytar
             };
         }
 
-        private void SetupSession(NetworkSession netSession)
+        internal void SetupSession(NetworkSession netSession)
         {
             Session session;
             if (SetupSessionCallback != null)
                 session = SetupSessionCallback(netSession);
-            
+            else
+                session = new Session(netSession);
+            session.Start();
         }
 
         public Session WaitSession()
