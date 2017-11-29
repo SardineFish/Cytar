@@ -49,6 +49,11 @@ namespace Cytar
             }
         }
 
+        public virtual byte[] ReadPackage()
+        {
+            throw new NotImplementedException();
+        }
+
 
         public virtual void Join(APIContext context)
         {
@@ -102,13 +107,13 @@ namespace Cytar
             }
         }
 
-        public virtual object CallAPI(string apiName)
+        public virtual object CallAPI(string apiName, Stream stream)
         {
             try
             {
                 var api = GetAPI(apiName);
                 var paramsList = new List<object>();
-                CytarStreamReader cr = new CytarStreamReader(NetworkSession.Stream);
+                CytarStreamReader cr = new CytarStreamReader(stream);
                 foreach(var paramType in api.Parameters)
                 {
                     paramsList.Add(cr.ReadObject(paramType));

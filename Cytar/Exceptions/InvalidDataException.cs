@@ -6,14 +6,14 @@ namespace Cytar
 {
     public class InvalidDataException: Exception
     {
-        public byte[] Data { get; private set; }
+        public byte[] Buffer { get; private set; }
         public InvalidDataException(byte[] data) : base("Invalid data.")
         {
-            Data = data;
+            Buffer = data;
         }
         public InvalidDataException(byte[] data, string msg) : base(msg)
         {
-            Data = data;
+            Buffer = data;
         }
     }
 }

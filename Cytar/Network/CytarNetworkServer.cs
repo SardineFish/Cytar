@@ -19,9 +19,9 @@ namespace Cytar.Network
 
         public abstract event Action<Exception> OnError;
 
-        public CytarNetworkServer(Cytar Cytar)
+        public CytarNetworkServer(Cytar cytar)
         {
-            Cytar = Cytar;
+            Cytar = cytar;
         }
     }
 }

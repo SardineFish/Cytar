@@ -14,6 +14,7 @@ namespace Cytar.Network
 
         public abstract Stream Stream { get; protected set; }
 
+
         public abstract int Read(byte[] buffer, int idx, int count);
 
         public abstract void Write(byte[] buffer, int offset, int count);
