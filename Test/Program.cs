@@ -26,11 +26,15 @@ namespace Test
 
             var shop = new Shop();
             var bag = new List<int>();
-            var remoteSession = new Session(new TestNetworkSession());
-            var localSession = new Session(new TestNetworkSession());
+            TestStream local_remote = new TestStream();
+            TestStream remote_local = new TestStream();
+            var remoteSession = new Session(new TestNetworkSession(local_remote, remote_local));
+            var localSession = new Session(new TestNetworkSession(remote_local, local_remote));
 
             remoteSession.RootContext = shop;
             remoteSession.Join(shop.FruitsShelf);
+            remoteSession.Start();
+            localSession.Start();
 
             localSession.CallRemoteAPI<int>(
                 "GetIt",
@@ -42,6 +46,38 @@ namespace Test
                 {
                 }, 
                 5);
+            localSession.CallRemoteAPI<int>(
+                "/books/GetIt",
+                (cost) =>
+                {
+                    bag.Add((int)cost);
+                },
+                (error) =>
+                {
+                    Console.WriteLine(error.Message);
+                }, 100);
+            localSession.CallRemoteAPI<int>(
+                "/apple/GetIt",
+                (cost) =>
+                {
+                    bag.Add((int)cost);
+                },
+                (error) =>
+                {
+                    Console.WriteLine(error.Message);
+                }, 100);
+
+            localSession.CallRemoteAPI<int>(
+                "EatIt",
+                (cost) =>
+                {
+                    bag.Add((int)cost);
+                },
+                (error) =>
+                {
+                    Console.WriteLine(error.Message);
+                }, 100);
+
             //Total Cost
             var money = (int)remoteSession.CallAPI("TTCst", bag.ToArray());
             remoteSession.CallAPI("Pay", money);

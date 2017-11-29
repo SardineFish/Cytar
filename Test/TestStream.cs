@@ -34,13 +34,17 @@ namespace Test
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-            while(count + ReadPosition <WritePosition)
+            while(count + ReadPosition >WritePosition)
             {
                 waiting.WaitOne();
             }
-            ms.Position = ReadPosition;
-            var length = ms.Read(buffer, offset, count);
-            ReadPosition = ms.Position;
+            int length = 0;
+            lock (ms)
+            {
+                ms.Position = ReadPosition;
+                length = ms.Read(buffer, offset, count);
+                ReadPosition = ms.Position;
+            }
             return length;
         }
 
@@ -55,10 +59,12 @@ namespace Test
 
         public override void Write(byte[] buffer, int offset, int count)
         {
-
-            ms.Position = WritePosition;
-            ms.Write(buffer, offset, count);
-            WritePosition = ms.Position;
+            lock(ms)
+            {
+                ms.Position = WritePosition;
+                ms.Write(buffer, offset, count);
+                WritePosition = ms.Position;
+            }
             waiting.Set();
         }
     }

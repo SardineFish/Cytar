@@ -12,12 +12,18 @@ namespace Cytar.Serialization
         {
             if (obj is byte)
                 return new byte[] { (byte)obj };
-            else if (obj is Int16 || obj is UInt16)
-                return CytarConvert.ToBytes(Convert.ToUInt16(obj));
-            else if (obj is Int32 || obj is UInt32)
-                return CytarConvert.ToBytes(Convert.ToUInt32(obj));
-            else if (obj is Int64 || obj is UInt64)
-                return CytarConvert.ToBytes(Convert.ToUInt64(obj));
+            else if (obj is Int16)
+                return CytarConvert.ToBytes((Int16)obj);
+            else if (obj is UInt16)
+                return CytarConvert.ToBytes((UInt16)obj);
+            else if (obj is Int32)
+                return CytarConvert.ToBytes((Int32)obj);
+            else if (obj is UInt32)
+                return CytarConvert.ToBytes((UInt32)obj);
+            else if (obj is Int64)
+                return CytarConvert.ToBytes((Int64)obj);
+            else if (obj is UInt64)
+                return CytarConvert.ToBytes((UInt64)obj);
             else if (obj is float)
                 return CytarConvert.ToBytes(Convert.ToSingle(obj));
             else if (obj is double)
@@ -36,7 +42,7 @@ namespace Cytar.Serialization
             else if (obj is Array)
             {
                 var dataList = new List<byte[]>();
-                foreach(var slice in (obj as Array))
+                foreach (var slice in (obj as Array))
                 {
                     dataList.Add(Serialize(slice));
                 }

@@ -11,11 +11,11 @@ namespace Test
 {
     public class TestNetworkSession : NetworkSession
     {
-        public TestNetworkSession()
+        public TestNetworkSession(TestStream inputStream,TestStream outputStream)
         {
-            InnerStream = new TestStream();
-            InputStream = new InputStream(InnerStream);
-            OutputStream = new OutputStream(InnerStream);
+
+            InputStream = new InputStream(inputStream);
+            OutputStream = new OutputStream(outputStream);
         }
 
         public override bool Connected { get => true; protected set{ } }

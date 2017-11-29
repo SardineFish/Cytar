@@ -137,7 +137,7 @@ namespace Cytar
             {
                 CytarStreamReader cr = new CytarStreamReader(sourceStream);
                 CytarStreamWriter cw = new CytarStreamWriter(NetworkSession.OutputStream);
-                cw.Write(sourceStream.Length);
+                cw.Write((int)sourceStream.Length);
                 cw.Write(cr.ReadBytes((int)sourceStream.Length));
                 //sourceStream.CopyTo(NetworkSession.OutputStream);
             }
@@ -217,11 +217,11 @@ namespace Cytar
             RemoteCallingRecode.Add(remoteAPI.CallingID, remoteAPI);
             MemoryStream ms = new MemoryStream();
             CytarStreamWriter cw = new CytarStreamWriter(ms);
-            cw.Write(apiName);
             cw.Write(callingID);
+            cw.Write(apiName);
             foreach (var arg in param)
             {
-                cw.Write(param);
+                cw.Write(arg);
             }
             ms.Position = 0;
             SendPackage(ms);
