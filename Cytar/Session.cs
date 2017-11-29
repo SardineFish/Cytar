@@ -90,10 +90,28 @@ namespace Cytar
             CytarStreamReader cr = new CytarStreamReader(ms);
             var cid = cr.ReadInt32();
             string apiName = cr.ReadString();
-            var (result, isVoid) = CallAPI(apiName, ms);
-            if (!isVoid)
+            if(apiName == APIReturnHandlerAPI)
             {
+                OnAPIReturn(cid, ms);
+                return;
+            }
+            else if(apiName == ErrorHandlerAPI)
+            {
+                OnError(cid, cr.ReadObject<RemoteException>());
+                return;
+            }
 
+            try
+            {
+                var (result, isVoid) = CallAPI(apiName, ms);
+                if (!isVoid)
+                {
+                    CallRemoteAPI(APIReturnHandlerAPI, result);
+                }
+            }
+            catch (Exception ex)
+            {
+                CallRemoteAPI(ErrorHandlerAPI, new RemoteException(ex.Message));
             }
         }
         
@@ -106,6 +124,14 @@ namespace Cytar
                 cw.Write(data.Length);
                 cw.Write(data, 0, data.Length);
                 NetworkSession.OutputStream.Flush();
+            }
+        }
+
+        public virtual void SendPackage(MemoryStream sourceStream)
+        {
+            lock (NetworkSession.OutputStream)
+            {
+                sourceStream.CopyTo(NetworkSession.OutputStream);
             }
         }
 
@@ -177,45 +203,64 @@ namespace Cytar
 
         public virtual void CallRemoteAPI(string apiName, Type returnType, Action<object> returnCallback, Action<RemoteException> errorCallback, params object[] param)
         {
+            var callingID = NextCallingID;
 
+            RemoteAPIInfo remoteAPI = new RemoteAPIInfo(apiName, callingID, returnType, returnCallback, errorCallback);
+            RemoteCallingRecode.Add(remoteAPI.CallingID, remoteAPI);
+            MemoryStream ms = new MemoryStream();
+            CytarStreamWriter cw = new CytarStreamWriter(ms);
+            cw.Write(apiName);
+            cw.Write(callingID);
+            foreach (var arg in param)
+            {
+                cw.Write(param);
+            }
+            ms.Position = 0;
+            SendPackage(ms);
         }
         public virtual void CallRemoteAPI<T>(string apiName, Action<object> returnCallback, Action<RemoteException> errorCallback, params object[] param)
         {
-
+            CallRemoteAPI(apiName, typeof(T), returnCallback, errorCallback, param);
         }
         public virtual void CallRemoteAPI(string apiName, Type returnType, Action<object> callback, params object[] param)
         {
-
+            CallRemoteAPI(apiName, returnType, callback, null, param);
         }
         public virtual void CallRemoteAPI<T>(string apiName, Action<T> callback, params object[] param)
         {
+            CallRemoteAPI(apiName, typeof(T), callback, null, param);
+        }
 
+        public virtual void CallRemoteAPI(string apiName, Type returnType, params object[] param)
+        {
+            CallRemoteAPI(apiName, returnType, null, null, param);
         }
         public virtual void CallRemoteAPI<T>(string apiName, params object[] param)
         {
-
+            CallRemoteAPI(apiName, typeof(T), null, null, param);
         }
         public virtual void CallRemoteAPI(string apiName,params object[] param)
         {
-
-        }
-
-        public virtual void CallRemoteAPI(string apiName,Type returnType, params object[] param)
-        {
-
+            CallRemoteAPI(apiName, typeof(void), null, null, param);
         }
 
         [CytarAPI(APIReturnHandlerAPI)]
-        public virtual void OnAPIReturn(int cid,params object[] param)
+        public virtual void OnAPIReturn(int cid, Stream returnStream)
         {
-
+            if (!RemoteCallingRecode.ContainsKey(cid))
+                return;
+            CytarStreamReader cr = new CytarStreamReader(returnStream);
+            RemoteCallingRecode[cid].Return(cr.ReadObject(RemoteCallingRecode[cid].ReturnType));
+            RemoteCallingRecode.Remove(cid);
         }
 
         [CytarAPI(ErrorHandlerAPI)]
-        public virtual void OnError(string message)
+        public virtual void OnError(int cid, RemoteException exception)
         {
-            if (Error != null)
-                Error.Invoke(this, message);
+            if (!RemoteCallingRecode.ContainsKey(cid))
+                return;
+            RemoteCallingRecode[cid].OnError(exception);
+            RemoteCallingRecode.Remove(cid);
         }
 
         public virtual object CallPathAPI(string path,params object[] param)

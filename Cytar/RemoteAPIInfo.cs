@@ -30,5 +30,15 @@ namespace Cytar
 
         public Action<RemoteException> ErrorCallback { get; private set; }
 
+        public void Return(object obj)
+        {
+            ReturnCallback?.Invoke(obj);
+        }
+
+        public void OnError(RemoteException exception)
+        {
+            ReturnCallback?.Invoke(exception);
+        }
+
     }
 }
