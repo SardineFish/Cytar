@@ -15,6 +15,7 @@ namespace Cytar
     {
         public const string ErrorHandlerAPI = "_ERR";
         public const string APIReturnHandlerAPI = "_RTN";
+        public const string CloseCallbackAPI = "_CLS";
 
         public Session(NetworkSession netSession) : this()
         {
@@ -29,6 +30,8 @@ namespace Cytar
             RemoteCallingRecode = new Dictionary<int, RemoteAPIInfo>();
         }
 
+        public virtual bool Actived { get; protected set; }
+
         public virtual NetworkSession NetworkSession { get; protected set; }
         public virtual Thread HandleThread { get; protected set; }
 
@@ -37,6 +40,8 @@ namespace Cytar
         public virtual APIContext RootContext { get; set; }
 
         public virtual event Action<Session, string> Error;
+
+        public virtual event Action<Session, int> RemoteClose;
         
         public virtual int PackageSizeLimit { get; set; }
 
@@ -76,9 +81,10 @@ namespace Cytar
                 APIContext.Remove(context);
         }
 
-        public virtual void Close(int errCode)
+        public virtual void Close(int code)
         {
-
+            CallRemoteAPI(CloseCallbackAPI, code);
+            NetworkSession.Close();
         }
 
         #endregion
@@ -87,15 +93,17 @@ namespace Cytar
 
         protected virtual void StartHandle()
         {
+            Actived = true;
             while (NetworkSession.Connected)
             {
                 try
                 {
                     HandlePackage(ReadPackage(PackageSizeLimit));
                 }
-                catch (IOException)
+                catch (IOException ex)
                 {
-
+                    if (Actived)
+                        OnCloseCallback(-1);
                 }
                 catch (Exception ex)
                 {
@@ -117,7 +125,7 @@ namespace Cytar
             }
             else if(apiName == ErrorHandlerAPI)
             {
-                OnError(cid, cr.ReadObject<RemoteException>());
+                OnErrorCallback(cid, cr.ReadObject<RemoteException>());
                 return;
             }
 
@@ -426,12 +434,19 @@ namespace Cytar
         }
 
         [CytarAPI(ErrorHandlerAPI)]
-        public virtual void OnError(int cid, RemoteException exception)
+        public virtual void OnErrorCallback(int cid, RemoteException exception)
         {
             if (!RemoteCallingRecode.ContainsKey(cid))
                 return;
             RemoteCallingRecode[cid].OnError(exception);
             RemoteCallingRecode.Remove(cid);
+        }
+
+        [CytarAPI(CloseCallbackAPI)]
+        public virtual void OnCloseCallback(int code)
+        {
+            Actived = false;
+            RemoteClose?.Invoke(this, code);
         }
     }
 }

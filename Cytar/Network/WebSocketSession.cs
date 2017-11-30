@@ -14,6 +14,11 @@ namespace Cytar.Network
         public override OutputStream OutputStream { get => throw new NotImplementedException(); protected set => throw new NotImplementedException(); }
         protected override Stream InnerStream { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
+        public override void Close()
+        {
+            throw new NotImplementedException();
+        }
+
         public override int Read(byte[] buffer, int idx, int count)
         {
             throw new NotImplementedException();

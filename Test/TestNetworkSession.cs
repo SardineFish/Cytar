@@ -24,6 +24,11 @@ namespace Test
         public override OutputStream OutputStream { get ; protected set; }
         protected override Stream InnerStream { get ; set ; }
 
+        public override void Close()
+        {
+            throw new NotImplementedException();
+        }
+
         public override int Read(byte[] buffer, int idx, int count)
         {
             throw new NotImplementedException();

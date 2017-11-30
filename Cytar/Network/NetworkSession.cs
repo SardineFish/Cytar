@@ -40,6 +40,6 @@ namespace Cytar.Network
             throw new NotImplementedException();
         }
 
-
+        public abstract void Close();
     }
 }

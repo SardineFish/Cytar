@@ -43,5 +43,16 @@ namespace Cytar
             else
                 throw new NotImplementedException();
         }
+        public void Close(int code)
+        {
+            if (Protocol == Protocol.TCP)
+            {
+                Session.Close(0);
+            }
+        }
+        public void Close()
+        {
+            Close(0);
+        }
     }
 }

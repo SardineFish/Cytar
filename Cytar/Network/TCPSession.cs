@@ -60,6 +60,11 @@ namespace Cytar.Network
             }
         }
 
+        public override void Close()
+        {
+            TcpClient.Close();
+        }
+
         public TCPSession(TcpClient client)
         {
             TcpClient = client;

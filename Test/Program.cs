@@ -51,6 +51,7 @@ namespace Test
                 }
                 await client.Session.CallRemoteAPIAsync("Pay", 1000);
             }).Wait();
+            
             client.Session.CallRemoteAPI<int>(
                 "GetIt",
                 (cost) =>
