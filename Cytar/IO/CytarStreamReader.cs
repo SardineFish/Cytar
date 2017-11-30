@@ -31,6 +31,8 @@ namespace Cytar.IO
 
         public byte ReadByte() => ReadBytes(1)[0];
 
+        public Boolean ReadBoolean() => CytarConvert.ToBoolean(ReadBytes(1));
+
         public Int16 ReadInt16() => CytarConvert.ToInt16(ReadBytes(2));
 
         public UInt16 ReadUInt16() => CytarConvert.ToUInt16(ReadBytes(2));
@@ -102,6 +104,8 @@ namespace Cytar.IO
 
             if (type == typeof(byte))
                 return ReadByte();
+            if (type == typeof(bool))
+                return ReadBoolean();
             else if (type == typeof(UInt16))
                 return ReadUInt16();
             else if (type == typeof(Int16))

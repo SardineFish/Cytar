@@ -12,6 +12,8 @@ namespace Cytar.Serialization
         {
             if (obj is byte)
                 return new byte[] { (byte)obj };
+            else if (obj is Boolean)
+                return CytarConvert.ToBytes((Boolean)obj);
             else if (obj is Int16)
                 return CytarConvert.ToBytes((Int16)obj);
             else if (obj is UInt16)

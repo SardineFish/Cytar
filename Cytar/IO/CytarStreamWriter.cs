@@ -18,6 +18,7 @@ namespace Cytar.IO
 
         public void Write(byte[] data, int offset, int count) => Stream.Write(data, offset, count);
         public void Write(byte number) => Write(new byte[] { number }, 0, 1);
+        public void Write(Boolean value) => Write(CytarSerialize.Serialize(value), 0, 1);
         public void Write(Int16 number) => Write(CytarSerialize.Serialize(number), 0, 2);
         public void Write(UInt16 number) => Write(CytarSerialize.Serialize(number), 0, 2);
         public void Write(Int32 number) => Write(CytarSerialize.Serialize(number), 0, 4);

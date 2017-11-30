@@ -12,6 +12,12 @@ namespace Cytar
                 return 0;
             return data[0];
         }
+        public static Boolean ToBoolean(byte[] data)
+        {
+            if (data.Length < 0)
+                throw new ArgumentException("Length of data must > 0");
+            return data[0] > 0;
+        }
         public static Int16 ToInt16(byte[] data)
         {
             return (Int16)(
@@ -100,6 +106,10 @@ namespace Cytar
         public static byte[] ToBytes(byte number)
         {
             return new byte[] { number };
+        }
+        public static byte[] ToBytes(bool value)
+        {
+            return new byte[] { value ? (byte)1 : (byte)0 };
         }
         public static byte[] ToBytes(UInt16 number)
         {
