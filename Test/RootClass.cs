@@ -21,6 +21,10 @@ namespace Test
             {
                 Console.WriteLine(text);
             }
+            public new object Call(string path, params object[] param)
+            {
+                return base.Call(path, param);
+            }
         }
 
         [Routable("sub")]
@@ -30,6 +34,11 @@ namespace Test
         public void RootFunction()
         {
             SubObject.Call("output", "RootFunction");
+        }
+
+        public new object Call(string path, params object[] param)
+        {
+            return base.Call(path, param);
         }
     }
 }

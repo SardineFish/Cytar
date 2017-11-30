@@ -8,6 +8,7 @@ using System.Linq;
 using EasyRoute;
 using Cytar.IO;
 using System.Threading.Tasks;
+using System.ComponentModel;
 
 namespace Cytar
 {
@@ -30,6 +31,7 @@ namespace Cytar
             RemoteCallingRecode = new Dictionary<int, RemoteAPIInfo>();
         }
 
+        #region Properties
         public virtual bool Actived { get; protected set; }
 
         public virtual NetworkSession NetworkSession { get; protected set; }
@@ -57,6 +59,8 @@ namespace Cytar
         protected virtual Dictionary<int,RemoteAPIInfo> RemoteCallingRecode { get; set; }
 
         public uint ID { get; internal set; }
+
+        #endregion
 
         #region Public Methods
         public virtual void Start()
@@ -178,6 +182,11 @@ namespace Cytar
         #endregion
 
         #region API Route
+
+        protected new object Call(string path, params object[] param)
+        {
+            return base.Call(path, param);
+        }
 
         public virtual object CallAPI(string apiName, params object[] param)
         {
@@ -423,6 +432,8 @@ namespace Cytar
 
         #endregion
 
+        #region API
+
         [CytarAPI(APIReturnHandlerAPI)]
         public virtual void OnAPIReturn(int cid, Stream returnStream)
         {
@@ -448,5 +459,7 @@ namespace Cytar
             Actived = false;
             RemoteClose?.Invoke(this, code);
         }
+
+        #endregion
     }
 }

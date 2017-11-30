@@ -14,8 +14,8 @@ namespace Test
         {
             Bill bill = new Bill("Billlll");
             var root = new RootClass();
-            root.Call("sub/output", "Hello world!");
-            root.Call("rootFunc");
+            /*root.Call("sub/output", "Hello world!");
+            root.Call("rootFunc");*/
             var data = Cytar.Serialization.CytarSerialize.Serialize(bill);
             Cytar.Serialization.CytarDeserialize.Deserialize<Bill>(data);
             var serverRoot = new ServerRoot();
@@ -33,6 +33,7 @@ namespace Test
             {
                 session.RootContext = shop;
                 session.Join(shop.FruitsShelf);
+                
             });
             CytarClient client = new CytarClient(Protocol.TCP, "127.0.0.1", 36514);
             client.Connect();
