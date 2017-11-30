@@ -217,7 +217,10 @@ namespace Cytar
             CytarStreamReader cr = new CytarStreamReader(stream);
             foreach (var paramType in api.Parameters)
             {
-                paramsList.Add(cr.ReadObject(paramType));
+                if (paramType.IsSubclassOf(typeof(Session)))
+                    paramsList.Add(this);
+                else
+                    paramsList.Add(cr.ReadObject(paramType));
             }
             return (api.Method.Invoke(api.APIContext, paramsList.ToArray()), api.Method.ReturnType == typeof(void));
         }
