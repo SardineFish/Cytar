@@ -391,18 +391,19 @@ namespace Cytar
             });
         }
 
-        public virtual async Task<T> CallRemoteAPIAsync<T>(string apiName,params object[] param)
+        public virtual async Task<T> CallRemoteAPIAsync<T>(string apiName, params object[] param)
         {
             return await Task.Run<T>(() =>
-            {
-                var remoteAPI = CallRemoteAPIAndGetInfo(apiName, typeof(T), null, null, param);
-                remoteAPI.AutoResetEvent.WaitOne();
-                if (remoteAPI.Exception != null)
-                    throw remoteAPI.Exception;
-                if (typeof(T) == typeof(void))
-                    return default(T);
-                return (T)remoteAPI.ReturnObject;
-            });
+                {
+                    var remoteAPI = CallRemoteAPIAndGetInfo(apiName, typeof(T), null, null, param);
+                    remoteAPI.AutoResetEvent.WaitOne();
+                    if (remoteAPI.Exception != null)
+                        throw remoteAPI.Exception;
+
+                    if (typeof(T) == typeof(void))
+                        return default(T);
+                    return (T)remoteAPI.ReturnObject;
+                });
         }
 
         #endregion

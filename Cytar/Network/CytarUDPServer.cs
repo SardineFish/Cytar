@@ -18,6 +18,7 @@ namespace Cytar.Network
                     return false;
                 return true;
             }
+            protected set { }
         }
         string host;
         public string Host

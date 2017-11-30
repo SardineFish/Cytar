@@ -18,6 +18,7 @@ namespace Cytar.Network
                     return false;
                 return true;
             }
+            protected set { }
         }
 
         public override event Action<Exception> OnError;

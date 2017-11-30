@@ -54,6 +54,7 @@ namespace Cytar.Network
                     return false;
                 return true;
             }
+            protected set { }
         }
 
         public override Thread ServerThread { get; protected set; }

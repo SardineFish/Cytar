@@ -38,6 +38,14 @@ namespace Cytar
             WebSocketServer?.Start();
         }
 
+        public void Stop()
+        {
+            TCPServer?.Stop();
+            UDPServer?.Stop();
+            HTTPServer?.Stop();
+            WebSocketServer?.Stop();
+        }
+
         public void UseTCP(string host,int port)
         {
             TCPServer = new CytarTCPServer(this, host, port);

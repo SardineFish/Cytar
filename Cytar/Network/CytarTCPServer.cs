@@ -9,15 +9,7 @@ namespace Cytar.Network
 {
     public class CytarTCPServer: CytarNetworkServer
     {
-        public override bool Running
-        {
-            get
-            {
-                if (TcpListener == null || !TcpListener.Server.Connected)
-                    return false;
-                return true;
-            }
-        }
+        public override bool Running { get; protected set; }
         
         public TcpListener TcpListener { get; private set; }
 
@@ -53,16 +45,15 @@ namespace Cytar.Network
 
         public override event Action<Exception> OnError;
 
-        public CytarTCPServer(Cytar Cytar, string host, int port):base(Cytar)
+        public CytarTCPServer(Cytar cytar, string host, int port):base(cytar)
         {
             Host = host;
             Port = port;
+            Running = false;
         }
 
-        protected CytarTCPServer(Cytar Cytar):base(Cytar)
+        protected CytarTCPServer(Cytar cytar) : this(cytar, "0.0.0.0", 0)
         {
-            Host = "0.0.0.0";
-            Port = 0;
         }
 
         public override void Start()
@@ -81,6 +72,7 @@ namespace Cytar.Network
 
                 TcpListener = new TcpListener(addr[0], Port);
                 TcpListener.Start();
+                Running = true;
                 while (true)
                 {
                     try
@@ -88,8 +80,9 @@ namespace Cytar.Network
                         var client = TcpListener.AcceptTcpClient();
                         Cytar.SetupSession(new TCPSession(client));
                     }
-                    catch(SocketException)
+                    catch (SocketException)
                     {
+                        Running = false;
                         return;
                     }
                 }
@@ -103,7 +96,8 @@ namespace Cytar.Network
 
         public override void Stop()
         {
-            throw new NotImplementedException();
+            Running = false;
+            TcpListener.Stop();
         }
     }
 }

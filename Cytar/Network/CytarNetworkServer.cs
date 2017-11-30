@@ -7,7 +7,7 @@ namespace Cytar.Network
 {
     public abstract class CytarNetworkServer
     {
-        public abstract bool Running { get; }
+        public abstract bool Running { get; protected set; }
 
         public abstract Thread ServerThread { get; protected set; }
 
