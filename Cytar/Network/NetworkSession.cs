@@ -26,6 +26,22 @@ namespace Cytar.Network
         public virtual Session Session { get; internal set; }
         public uint ID { get; internal set; }
 
+        public Protocol Protocol
+        {
+            get
+            {
+                if (this is TCPSession)
+                    return Protocol.TCP;
+                else if (this is UDPSession)
+                    return Protocol.UDP;
+                else if (this is HTTPSession)
+                    return Protocol.HTTP;
+                else if (this is WebSocketSession)
+                    return Protocol.WebSocket;
+                return Protocol.Unknown;
+            }
+        }
+
         public abstract int ReadByte();
 
         public abstract void WriteByte(byte value);

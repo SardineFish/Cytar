@@ -124,6 +124,7 @@ namespace Cytar
     }
     public enum Protocol : byte
     {
+        Unknown = 0,
         TCP = 1,
         UDP = 2,
         HTTP = 4,
