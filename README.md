@@ -1,2 +1,2 @@
-# Cytar
-A framework for cross-platform remote API calling.
+# CytarMP
+A framework for multiplayer gaming
