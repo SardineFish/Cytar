@@ -24,12 +24,12 @@ namespace Cytar
         public string Host { get;}
         public int Port { get; }
 
-        public Session Connect()
+        public virtual Session Connect()
         {
             return Connect<Session>();
         }
 
-        public SessionT Connect<SessionT>() where SessionT : Session, new()
+        public virtual SessionT Connect<SessionT>() where SessionT : Session, new()
         {
             if (Protocol == Protocol.TCP)
             {
