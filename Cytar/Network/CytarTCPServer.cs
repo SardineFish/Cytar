@@ -65,12 +65,12 @@ namespace Cytar.Network
         public void threadFunction()
         {
             try
-            {   
-                var addr = Dns.GetHostAddresses(Host);
+            {
+                /*var addr = Dns.GetHostAddresses(Host);
                 if (addr.Length < 1)
-                    throw new ArgumentException("Unknown host.");
+                    throw new ArgumentException("Unknown host.");*/
 
-                TcpListener = new TcpListener(addr[0], Port);
+                TcpListener = new TcpListener(IPAddress.Any, Port);
                 TcpListener.Start();
                 Running = true;
                 while (true)

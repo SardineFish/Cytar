@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Cytar
 {
-    public class Session: RoutableObject, IDObject, IAPIContext
+    public class Session: RoutableObject, IDObject, IAPIContext, IDisposable
     {
         public const string ErrorHandlerAPI = "_ERR";
         public const string APIReturnHandlerAPI = "_RTN";
@@ -85,7 +85,10 @@ namespace Cytar
         {
             CallRemoteAPI(CloseCallbackAPI, code);
             NetworkSession.Close();
+            Dispose();
         }
+        
+
 
         #endregion
 
@@ -451,5 +454,37 @@ namespace Cytar
             Actived = false;
             RemoteClose?.Invoke(this, code);
         }
+
+        #region IDisposable Support
+        private bool disposedValue = false; 
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    foreach (var context in this.APIContext)
+                    {
+                        context.Sessions.Remove(this);
+                    }
+                    RootContext.Sessions.Remove(this);
+                }
+
+                // TODO: 释放未托管的资源(未托管的对象)并在以下内容中替代终结器。
+                // TODO: 将大型字段设置为 null。
+
+                disposedValue = true;
+            }
+        }
+        public void Dispose()
+        {
+            // 请勿更改此代码。将清理代码放入以上 Dispose(bool disposing) 中。
+            Dispose(true);
+            // TODO: 如果在以上内容中替代了终结器，则取消注释以下行。
+            // GC.SuppressFinalize(this);
+        }
+        #endregion
+
     }
 }

@@ -104,7 +104,7 @@ namespace Cytar.IO
 
             if (type == typeof(byte))
                 return ReadByte();
-            if (type == typeof(bool))
+            if (type == typeof(Boolean))
                 return ReadBoolean();
             else if (type == typeof(UInt16))
                 return ReadUInt16();
