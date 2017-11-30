@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 
 namespace Cytar
 {
@@ -21,6 +22,7 @@ namespace Cytar
             ReturnType = returnType;
             ReturnCallback = returnCallback;
             ErrorCallback = errorCallback;
+            AutoResetEvent = new AutoResetEvent(false);
         }
 
         public string Name { get; private set; }
@@ -30,13 +32,23 @@ namespace Cytar
 
         public Action<RemoteException> ErrorCallback { get; private set; }
 
+        public AutoResetEvent AutoResetEvent { get; private set; }
+
+        public object ReturnObject { get; private set; }
+
+        public RemoteException Exception { get; private set; }
+
         public void Return(object obj)
         {
+            ReturnObject = obj;
+            AutoResetEvent.Set();
             ReturnCallback?.Invoke(obj);
         }
 
         public void OnError(RemoteException exception)
         {
+            Exception = exception;
+            AutoResetEvent.Set();
             ErrorCallback?.Invoke(exception);
         }
 

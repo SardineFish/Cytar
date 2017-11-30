@@ -7,6 +7,7 @@ using System.Threading;
 using System.Linq;
 using EasyRoute;
 using Cytar.IO;
+using System.Threading.Tasks;
 
 namespace Cytar
 {
@@ -325,11 +326,11 @@ namespace Cytar
             }
         }
 
-        #endregion 
-        
+        #endregion
+
         #region Call Remote API
 
-        public virtual void CallRemoteAPI(string apiName, Type returnType, Action<object> returnCallback, Action<RemoteException> errorCallback, params object[] param)
+        protected virtual RemoteAPIInfo CallRemoteAPIAndGetInfo(string apiName, Type returnType, Action<object> returnCallback, Action<RemoteException> errorCallback, params object[] param)
         {
             var callingID = NextCallingID;
 
@@ -345,6 +346,12 @@ namespace Cytar
             }
             ms.Position = 0;
             SendPackage(ms);
+            return remoteAPI;
+        }
+
+        public virtual void CallRemoteAPI(string apiName, Type returnType, Action<object> returnCallback, Action<RemoteException> errorCallback, params object[] param)
+        {
+            CallRemoteAPIAndGetInfo(apiName, returnType, returnCallback, errorCallback, param);
         }
         public virtual void CallRemoteAPI<T>(string apiName, Action<object> returnCallback, Action<RemoteException> errorCallback, params object[] param)
         {
@@ -370,6 +377,32 @@ namespace Cytar
         public virtual void CallRemoteAPI(string apiName, params object[] param)
         {
             CallRemoteAPI(apiName, typeof(void), null, null, param);
+        }
+
+        public virtual async Task<object> CallRemoteAPIAsync(string apiName,Type returnType, params object[] param)
+        {
+            return await Task.Run<object>(() =>
+            {
+                var remoteAPI = CallRemoteAPIAndGetInfo(apiName, returnType, null, null, param);
+                remoteAPI.AutoResetEvent.WaitOne();
+                if (remoteAPI.Exception != null)
+                    throw remoteAPI.Exception;
+                return remoteAPI.ReturnObject;
+            });
+        }
+
+        public virtual async Task<T> CallRemoteAPIAsync<T>(string apiName,params object[] param)
+        {
+            return await Task.Run<T>(() =>
+            {
+                var remoteAPI = CallRemoteAPIAndGetInfo(apiName, typeof(T), null, null, param);
+                remoteAPI.AutoResetEvent.WaitOne();
+                if (remoteAPI.Exception != null)
+                    throw remoteAPI.Exception;
+                if (typeof(T) == typeof(void))
+                    return default(T);
+                return (T)remoteAPI.ReturnObject;
+            });
         }
 
         #endregion

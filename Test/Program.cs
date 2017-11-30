@@ -10,7 +10,7 @@ namespace Test
 {
     class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             Bill bill = new Bill("Billlll");
             var root = new RootClass();
@@ -36,7 +36,20 @@ namespace Test
             });
             CytarClient client = new CytarClient(Protocol.TCP, "127.0.0.1", 36514);
             client.Connect();
-
+            Task.Run(async () =>
+            {
+                bag.Add(await client.Session.CallRemoteAPIAsync<int>("GetIt", 5));
+                bag.Add(await client.Session.CallRemoteAPIAsync<int>("/books/GetIt", 100));
+                Console.WriteLine(await client.Session.CallRemoteAPIAsync<int>("TTCst", bag.ToArray()));
+                try
+                {
+                    await client.Session.CallRemoteAPIAsync<int>("/apple/GetIt", 1000);
+                }
+                catch(Exception ex)
+                {
+                    Console.WriteLine(ex);
+                }
+            }).Wait();
             client.Session.CallRemoteAPI<int>(
                 "GetIt",
                 (cost) =>
