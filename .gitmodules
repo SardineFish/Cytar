@@ -1,6 +1,3 @@
-[submodule "RoutableObject"]
-	path = RoutableObject
-	url = git@github.com:SardineFish/RoutableObject.git
 [submodule "EasyRoute"]
 	path = EasyRoute
-	url = git@github.com:SardineFish/EasyRoute.git
+	url = git@github.com:Dwscdv3/EasyRoute.git
