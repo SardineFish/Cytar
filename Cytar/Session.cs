@@ -123,7 +123,8 @@ namespace Cytar
             string apiName = cr.ReadString();
             if(apiName == APIReturnHandlerAPI)
             {
-                OnAPIReturn(cid, ms);
+                var returnID = cr.ReadInt32();
+                OnAPIReturn(returnID, ms);
                 return;
             }
             else if(apiName == ErrorHandlerAPI)
@@ -135,7 +136,7 @@ namespace Cytar
             try
             {
                 var (result, isVoid) = CallAPI(apiName, ms);
-                CallRemoteAPI(APIReturnHandlerAPI, result);
+                CallRemoteAPI(APIReturnHandlerAPI, cid, result);
             }
             catch (Exception ex)
             {
@@ -435,7 +436,10 @@ namespace Cytar
             if (!RemoteCallingRecode.ContainsKey(cid))
                 return;
             CytarStreamReader cr = new CytarStreamReader(returnStream);
-            RemoteCallingRecode[cid].Return(cr.ReadObject(RemoteCallingRecode[cid].ReturnType));
+            if (RemoteCallingRecode[cid].ReturnType == typeof(void))
+                RemoteCallingRecode[cid].Return(null);
+            else
+                RemoteCallingRecode[cid].Return(cr.ReadObject(RemoteCallingRecode[cid].ReturnType));
             RemoteCallingRecode.Remove(cid);
         }
 
@@ -452,6 +456,7 @@ namespace Cytar
         public virtual void OnCloseCallback(int code)
         {
             Actived = false;
+            Dispose();
             RemoteClose?.Invoke(this, code);
         }
 
