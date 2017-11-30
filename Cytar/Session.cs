@@ -124,10 +124,7 @@ namespace Cytar
             try
             {
                 var (result, isVoid) = CallAPI(apiName, ms);
-                if (!isVoid)
-                {
-                    CallRemoteAPI(APIReturnHandlerAPI, result);
-                }
+                CallRemoteAPI(APIReturnHandlerAPI, result);
             }
             catch (Exception ex)
             {
@@ -404,6 +401,16 @@ namespace Cytar
                         return default(T);
                     return (T)remoteAPI.ReturnObject;
                 });
+        }
+        public virtual async Task CallRemoteAPIAsync(string apiName, params object[] param)
+        {
+            await Task.Run(() =>
+            {
+                var remoteAPI = CallRemoteAPIAndGetInfo(apiName, typeof(void), null, null, param);
+                remoteAPI.AutoResetEvent.WaitOne();
+                if (remoteAPI.Exception != null)
+                    throw remoteAPI.Exception;
+            });
         }
 
         #endregion
