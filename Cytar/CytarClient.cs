@@ -29,7 +29,7 @@ namespace Cytar
             return Connect<Session>();
         }
 
-        public virtual SessionT Connect<SessionT>() where SessionT : Session, new()
+        public virtual SessionT Connect<SessionT>() where SessionT : Session
         {
             if (Protocol == Protocol.TCP)
             {
