@@ -56,7 +56,7 @@ namespace Cytar
 
         protected virtual Dictionary<int,RemoteAPIInfo> RemoteCallingRecode { get; set; }
 
-        public uint ID { get; internal set; }
+        public uint ID { get; protected set; }
 
         #region Public Methods
         public virtual void Start()

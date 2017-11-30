@@ -16,7 +16,7 @@ namespace Cytar
 
         public List<Session> Sessions { get; set; }
 
-        public uint ID { get; internal set; }
+        public uint ID { get; protected set; }
 
         public virtual object CallAPI(string name, params object[] param)
         {
