@@ -472,6 +472,7 @@ namespace Cytar
                     foreach (var context in this.APIContext)
                     {
                         context.Sessions.Remove(this);
+                        context.OnSessionExit(this);
                     }
                     RootContext.Sessions.Remove(this);
                 }

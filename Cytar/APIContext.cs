@@ -18,6 +18,11 @@ namespace Cytar
 
         public uint ID { get; protected set; }
 
+        internal virtual void OnSessionExit(Session session)
+        {
+
+        }
+
         public virtual object CallAPI(string name, params object[] param)
         {
             var apiMethods = this.GetType().GetMethods().Where(
