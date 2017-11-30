@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Text;
 using Cytar.IO;
 
@@ -12,6 +13,9 @@ namespace Cytar.Network
         public override bool SSID { get => throw new NotImplementedException(); protected set => throw new NotImplementedException(); }
         public override InputStream InputStream { get => throw new NotImplementedException(); protected set => throw new NotImplementedException(); }
         public override OutputStream OutputStream { get => throw new NotImplementedException(); protected set => throw new NotImplementedException(); }
+
+        public override IPAddress RemoteIPAdress => throw new NotImplementedException();
+
         protected override Stream InnerStream { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public override void Close()

@@ -42,6 +42,8 @@ namespace Cytar.Network
             }
         }
 
+        public abstract IPAddress RemoteIPAdress { get; }
+
         public abstract int ReadByte();
 
         public abstract void WriteByte(byte value);

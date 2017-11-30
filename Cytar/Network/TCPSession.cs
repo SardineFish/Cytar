@@ -28,6 +28,14 @@ namespace Cytar.Network
         public override InputStream InputStream { get ; protected set; }
         public override OutputStream OutputStream { get; protected set; }
 
+        public override IPAddress RemoteIPAdress
+        {
+            get
+            {
+                return (TcpClient.Client.RemoteEndPoint as IPEndPoint).Address;
+            }
+        }
+
         public override int Read(byte[] buffer, int offset, int count)
         {
             lock (InputStream)
