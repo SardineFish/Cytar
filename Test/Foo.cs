@@ -22,6 +22,7 @@ namespace Test
         public Foo()
         {
             //Text = "";
+            List = new double[] { 125.151, .36, 151313.31311, 1E-65 };
         }
 
         public class Bar

@@ -11,8 +11,8 @@ namespace Cytar.Serialization
         private static Dictionary<Type, Func<object, byte[]>> ExtendedSerialization = new Dictionary<Type, Func<object, byte[]>>();
         public static byte[] Serialize(Type type,object obj)
         {
-            if (ExtendedSerialization.ContainsKey(obj.GetType()))
-                return ExtendedSerialization[obj.GetType()].Invoke(obj);
+            if (ExtendedSerialization.ContainsKey(type))
+                return ExtendedSerialization[type].Invoke(obj);
             if (type == typeof(byte))
                 return new byte[] { (byte)obj };
             else if (type == typeof(Boolean))
@@ -49,7 +49,7 @@ namespace Cytar.Serialization
                 var data = Encoding.UTF8.GetBytes(obj as string);
                 return Combine(CytarConvert.ToBytes(data.Length), data);
             }
-            else if (type == typeof(Array))
+            else if (type.IsArray)
             {
                 if(obj == null)
                 {
