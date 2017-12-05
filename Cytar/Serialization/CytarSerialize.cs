@@ -8,8 +8,11 @@ namespace Cytar.Serialization
 {
     public static class CytarSerialize
     {
+        private static Dictionary<Type, Func<object, byte[]>> ExtendedSerialization = new Dictionary<Type, Func<object, byte[]>>();
         public static byte[] Serialize(object obj)
         {
+            if (ExtendedSerialization.ContainsKey(obj.GetType()))
+                return ExtendedSerialization[obj.GetType()].Invoke(obj);
             if (obj is byte)
                 return new byte[] { (byte)obj };
             else if (obj is Boolean)
@@ -91,6 +94,11 @@ namespace Cytar.Serialization
                 dataList.Insert(0, CytarConvert.NumberToBytes(dataList.Count));
                 return Combine(dataList.ToArray());*/
             }
+        }
+
+        public static void ExtendSerialize(Type type,Func<object,byte[]> serializeCallback)
+        {
+            ExtendedSerialization[type] = serializeCallback;
         }
         static byte[] Combine(params object[] data)
         {
