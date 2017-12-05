@@ -6,4 +6,15 @@
     <AssemblyName>Cytar.Unity</AssemblyName>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Cytar\Cytar.csproj" />
+    <ProjectReference Include="..\EasyRoute\EasyRoute\EasyRoute.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="UnityEngine">
+      <HintPath>E:\Unity\Editor\Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>
