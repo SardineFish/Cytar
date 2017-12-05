@@ -135,7 +135,7 @@ namespace Cytar.Serialization
         private static byte ReadByte(Stream stream) => ReadBytes(stream, 1)[0];
         public static void ExtendDeserialize(Type type,Func<Stream,object> deserializeCallback)
         {
-
+            ExtendedDeserialization[type] = deserializeCallback;
         }
 
     }

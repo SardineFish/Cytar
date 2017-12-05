@@ -4,12 +4,13 @@ using System.Text;
 using Cytar;
 using Cytar.Serialization;
 using UnityEngine;
+using Cytar.IO;
 
 namespace Cytar.Unity
 {
-    public class CytarSerializationUnity
+    public static class CytarSerializeUnity
     {
-        static CytarSerializationUnity()
+        internal static void ExtentToCytar()
         {
             CytarSerialize.ExtendSerialize(typeof(Vector2), Vector2Serialize);
             CytarSerialize.ExtendSerialize(typeof(Vector3), Vector3Serialize);

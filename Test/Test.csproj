@@ -40,6 +40,9 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="UnityEngine">
+      <HintPath>E:\Unity\Editor\Data\Managed\UnityEngine.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Foo.cs" />
@@ -51,6 +54,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Cytar-Unity\Cytar-Unity.csproj">
+      <Project>{d9bb85a6-6eaf-4708-a95a-510d4e893891}</Project>
+      <Name>Cytar-Unity</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Cytar\Cytar.csproj">
       <Project>{11a335da-92dd-43ee-9d71-c353f6ff2a09}</Project>
       <Name>Cytar</Name>

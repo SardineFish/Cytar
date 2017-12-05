@@ -9,9 +9,9 @@ using Cytar.IO;
 
 namespace Cytar.Unity
 {
-    class CytarDeserializationUnity
+    public static class CytarDeserializeUnity
     {
-        static CytarDeserializationUnity()
+        internal static void ExtentToCytar()
         {
             CytarDeserialize.ExtendDeserialize(typeof(Vector2), Vector2Deserialize);
             CytarDeserialize.ExtendDeserialize(typeof(Vector3), Vector3Deserialize);
