@@ -13,8 +13,9 @@ namespace Test
     {
         public static void Main(string[] args)
         {
-            var buffer = CytarSerialize.Serialize(new Foo());
-            var obj = CytarDeserialize.Deserialize<Foo>(buffer);
+            var obj = new Foo();
+            var buffer = CytarSerialize.Serialize(obj);
+            obj = CytarDeserialize.Deserialize<Foo>(buffer);
         }
     }
 }

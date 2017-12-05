@@ -19,6 +19,11 @@ namespace Test
         [SerializableProperty(3)]
         public Bar obj = new Bar();
 
+        public Foo()
+        {
+            //Text = "";
+        }
+
         public class Bar
         {
             [SerializableProperty(0)]

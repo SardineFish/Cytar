@@ -79,11 +79,15 @@ namespace Cytar.Serialization
             else if (type == typeof(string))
             {
                 var size = Deserialize<int>(stream);
+                if (size < 0)
+                    return null;
                 return Encoding.UTF8.GetString(ReadBytes(stream, size));
             }
             else if (type.IsArray)
             {
                 var length = Deserialize<int>(stream);
+                if (length < 0)
+                    return null;
                 var elementType = type.GetElementType();
                 var array = Array.CreateInstance(elementType, length);
                 for (var i = 0; i < length; i++)
