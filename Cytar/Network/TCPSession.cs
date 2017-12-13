@@ -21,7 +21,7 @@ namespace Cytar.Network
             protected set { }
         }
 
-        public override bool SSID { get; protected set; }
+        public override uint SSID { get; protected set; }
 
         public TcpClient TcpClient { get; private set; }
         protected override Stream InnerStream { get; set; }
