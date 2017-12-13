@@ -4,6 +4,7 @@ using System.Text;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Cytar.Serialization;
 
 namespace Cytar.IO
 {
@@ -31,133 +32,36 @@ namespace Cytar.IO
 
         public byte ReadByte() => ReadBytes(1)[0];
 
-        public Boolean ReadBoolean() => CytarConvert.ToBoolean(ReadBytes(1));
+        public Boolean ReadBoolean() => CytarDeserialize.Deserialize<Boolean>(Stream);
 
-        public Int16 ReadInt16() => CytarConvert.ToInt16(ReadBytes(2));
+        public Int16 ReadInt16() => CytarDeserialize.Deserialize<Int16>(Stream);
 
-        public UInt16 ReadUInt16() => CytarConvert.ToUInt16(ReadBytes(2));
+        public UInt16 ReadUInt16() => CytarDeserialize.Deserialize<UInt16>(Stream);
 
-        public Int32 ReadInt32() => CytarConvert.ToInt32(ReadBytes(4));
+        public Int32 ReadInt32() => CytarDeserialize.Deserialize<Int32>(Stream);
 
-        public UInt32 ReadUInt32() => CytarConvert.ToUInt32(ReadBytes(4));
+        public UInt32 ReadUInt32() => CytarDeserialize.Deserialize<UInt32>(Stream);
 
-        public Int64 ReadInt64() => CytarConvert.ToInt64(ReadBytes(8));
+        public Int64 ReadInt64() =>CytarDeserialize.Deserialize<Int64>(Stream);
 
-        public UInt64 ReadUInt64() => CytarConvert.ToUInt64(ReadBytes(8));
+        public UInt64 ReadUInt64() => CytarDeserialize.Deserialize<UInt64>(Stream);
 
-        public float ReadSingle() => CytarConvert.ToSingle(ReadBytes(4));
+        public float ReadSingle() => CytarDeserialize.Deserialize<Single>(Stream);
 
-        public double ReadDouble() => CytarConvert.ToDouble(ReadBytes(8));
+        public double ReadDouble() => CytarDeserialize.Deserialize<double>(Stream);
 
-        public char ReadChar()
-        {
-            byte[] buffer = new byte[4];
-            buffer[0] = (byte)Stream.ReadByte();
-            if((buffer[0]& 0b10000000) == 0)
-            {
-                return Encoding.UTF8.GetString(new byte[1] { buffer[0] })[0];
-            }
-            else if ((buffer[0] & 0b11100000) == 0b11000000)
-            {
-                buffer[1] = (byte)Stream.ReadByte();
-                return Encoding.UTF8.GetString(new byte[2] { buffer[0], buffer[1] })[0];
-            }
-            else if((buffer[0] & 0b11110000) == 0b11100000)
-            {
-                buffer[1] = (byte)Stream.ReadByte();
-                buffer[2] = (byte)Stream.ReadByte();
-                return Encoding.UTF8.GetString(new byte[3] { buffer[0], buffer[1], buffer[2] })[0];
-            }
-            else if((buffer[0] & 0b11111000) == 0b11110000)
-            {
-                buffer[1] = (byte)Stream.ReadByte();
-                buffer[2] = (byte)Stream.ReadByte();
-                buffer[3] = (byte)Stream.ReadByte();
-                return Encoding.UTF8.GetString(buffer)[0];
-            }
-            else
-                return Encoding.UTF8.GetString(new byte[1] { buffer[0] })[0];
-        }
+        public char ReadChar() => CytarDeserialize.Deserialize<char>(Stream);
 
-        public string ReadString()
-        {
-            var size = ReadInt32();
-            return Encoding.UTF8.GetString(ReadBytes(size));
-        }
+        public string ReadString() => CytarDeserialize.Deserialize<string>(Stream);
 
-        public Array ReadArray(Type elementType)
-        {
-            var count = ReadInt32();
-            var array = Array.CreateInstance(elementType, count);
-            for(var i = 0; i < count; i++)
-                array.SetValue(ReadObject(elementType), i);
-            return array;
-        }
+        public Array ReadArray(Type elementType) => (Array)CytarDeserialize.Deserialize(elementType.MakeArrayType(), Stream);
 
-        public T[] ReadArray<T>()
-        {
-            return (T[])ReadArray(typeof(T));
-        }
+        public T[] ReadArray<T>() => CytarDeserialize.Deserialize<T[]>(Stream);
 
-        public object ReadObject(Type type)
-        {
+        public object ReadObject(Type type) => Serialization.CytarDeserialize.Deserialize(type, Stream);
 
-            if (type == typeof(byte))
-                return ReadByte();
-            if (type == typeof(Boolean))
-                return ReadBoolean();
-            else if (type == typeof(UInt16))
-                return ReadUInt16();
-            else if (type == typeof(Int16))
-                return ReadInt16();
-            else if (type == typeof(UInt32))
-                return ReadUInt32();
-            else if (type == typeof(Int32))
-                return ReadInt32();
-            else if (type == typeof(UInt64))
-                return ReadUInt64();
-            else if (type == typeof(Int64))
-                return ReadInt64();
-            else if (type == typeof(Single))
-                return ReadSingle();
-            else if (type == typeof(Double))
-                return ReadDouble();
-            else if (type == typeof(char))
-                return ReadChar();
-            else if (type == typeof(string))
-                return ReadString();
-            else if (type.IsArray)
-                return ReadArray(type.GetElementType());
+        public T ReadObject<T>() => (T)ReadObject(typeof(T));
 
-            if (ReadByte() == 0)
-                return null;
-            var members = type.GetMembers().Where(
-                       member => member.GetCustomAttributes(true).Where(
-                           attr => attr is SerializablePropertyAttribute).FirstOrDefault() != null)
-                           .OrderBy(
-                       member => (member.GetCustomAttributes(true).Where(
-                           attr => attr is SerializablePropertyAttribute).FirstOrDefault() as SerializablePropertyAttribute).Index).ToArray();
-            var obj = Activator.CreateInstance(type);
-            foreach (var mb in members)
-            {
-                if (mb.MemberType == MemberTypes.Field)
-                    (mb as FieldInfo).SetValue(obj, ReadObject((mb as FieldInfo).FieldType));
-                else if (mb.MemberType == MemberTypes.Property)
-                    (mb as PropertyInfo).SetValue(obj, ReadObject((mb as PropertyInfo).PropertyType));
-                else
-                    throw new DeserializeException("Type error.");
-            }
-            return obj;
-        }
-
-        public T ReadObject<T>()
-        {
-            return (T)ReadObject(typeof(T));
-        }
-
-        public void Dispose()
-        {
-            ((IDisposable)Stream).Dispose();
-        }
+        public void Dispose() => ((IDisposable)Stream).Dispose();
     }
 }
