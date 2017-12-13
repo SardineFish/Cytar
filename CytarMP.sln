@@ -9,6 +9,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Cytar", "Cytar\Cytar.csproj
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EasyRoute", "EasyRoute\EasyRoute\EasyRoute.csproj", "{0902AD31-AF4D-4070-94FF-47FB515AF52C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{60E38744-BFA5-44C8-96DF-4E11C8F41E5C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cytar-Unity", "Cytar-Unity\Cytar-Unity.csproj", "{D9BB85A6-6EAF-4708-A95A-510D4E893891}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,6 +27,14 @@ Global
 		{0902AD31-AF4D-4070-94FF-47FB515AF52C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0902AD31-AF4D-4070-94FF-47FB515AF52C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0902AD31-AF4D-4070-94FF-47FB515AF52C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{60E38744-BFA5-44C8-96DF-4E11C8F41E5C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60E38744-BFA5-44C8-96DF-4E11C8F41E5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60E38744-BFA5-44C8-96DF-4E11C8F41E5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60E38744-BFA5-44C8-96DF-4E11C8F41E5C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D9BB85A6-6EAF-4708-A95A-510D4E893891}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D9BB85A6-6EAF-4708-A95A-510D4E893891}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D9BB85A6-6EAF-4708-A95A-510D4E893891}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D9BB85A6-6EAF-4708-A95A-510D4E893891}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
