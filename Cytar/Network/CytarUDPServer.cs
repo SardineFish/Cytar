@@ -10,6 +10,7 @@ namespace Cytar.Network
     public class CytarUDPServer: CytarNetworkServer
     {
         public UdpClient UdpClient { get; private set; }
+        public Dictionary<uint, UDPSession> Sessions { get; private set; } = new Dictionary<uint, UDPSession>();
         public override bool Running
         {
             get
@@ -65,7 +66,18 @@ namespace Cytar.Network
 
         public override void Start()
         {
-            throw new NotImplementedException();
+
+        }
+
+        private void RunningThread()
+        {
+            while (Running)
+            {
+                
+            }
+            {
+                
+            }
         }
 
         public override void Stop()
