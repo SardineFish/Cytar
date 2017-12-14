@@ -9,7 +9,7 @@ namespace Cytar.Network
 {
     public class WebSocketSession : NetworkSession
     {
-        public override bool Connected { get => throw new NotImplementedException(); protected set => throw new NotImplementedException(); }
+        public override bool Available { get => throw new NotImplementedException(); protected set => throw new NotImplementedException(); }
         public override bool SSID { get => throw new NotImplementedException(); protected set => throw new NotImplementedException(); }
         public override InputStream InputStream { get => throw new NotImplementedException(); protected set => throw new NotImplementedException(); }
         public override OutputStream OutputStream { get => throw new NotImplementedException(); protected set => throw new NotImplementedException(); }

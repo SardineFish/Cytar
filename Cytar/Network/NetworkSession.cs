@@ -10,7 +10,7 @@ namespace Cytar.Network
 {
     public abstract class NetworkSession: IDObject
     {
-        public abstract bool Connected { get; protected set; }
+        public abstract bool Available { get; protected set; }
         public abstract uint SSID { get; protected set; }
 
         protected abstract Stream InnerStream { get; set; }

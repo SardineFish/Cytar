@@ -10,7 +10,7 @@ namespace Cytar.Network
 {
     public class TCPSession : NetworkSession
     {
-        public override bool Connected
+        public override bool Available
         {
             get
             {
