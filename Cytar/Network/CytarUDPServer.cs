@@ -84,9 +84,15 @@ namespace Cytar.Network
             get;private set;
         }
 
-        public override Thread ServerThread { get => throw new NotImplementedException(); protected set => throw new NotImplementedException(); }
+        public override Thread ServerThread { get; protected set; }
 
         public CytarUDPServer(Cytar Cytar,string host,int port): base(Cytar)
+        {
+            Host = host;
+            Port = port;
+        }
+
+        public CytarUDPServer(string host, int port) : base(null)
         {
             Host = host;
             Port = port;
@@ -103,11 +109,13 @@ namespace Cytar.Network
             IPEndPoint = new IPEndPoint(IPAddress.Any, Port);
             UdpClient = new UdpClient(IPEndPoint);
             Running = true;
+            RunningThread();
+            /*
             ServerThread = new Thread(RunningThread);
-            ServerThread.Start();
+            ServerThread.Start();*/
         }
 
-        private void RunningThread()
+        public void RunningThread()
         {
             while (Running)
             {
