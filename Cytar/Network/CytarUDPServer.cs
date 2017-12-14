@@ -152,13 +152,19 @@ namespace Cytar.Network
                     Sessions[ssid].OnReset(UdpClient, remoteIP);
                 Sessions[ssid].OnDataReceived(cr.ReadBytes(data.Length - 4));
             }
+
+            foreach (var session in Sessions.Values)
+            {
+                session.CloseAndWait();
+            }
+            Sessions = null;
+            UdpClient.Dispose();
         }
 
         public override void Stop()
         {
             Running = false;
-            ServerThread.Abort();
-            UdpClient.Dispose();
+            //ServerThread.Abort();
         }
         
     }

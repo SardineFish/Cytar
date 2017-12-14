@@ -58,7 +58,12 @@ namespace Cytar.Network
         public override void Close()
         {
             Available = false;
-            HandleThread.Abort();
+            //HandleThread.Abort();
+        }
+
+        public void CloseAndWait()
+        {
+            Available = false;
         }
 
         public override int Read(byte[] buffer, int idx, int count)
@@ -173,7 +178,11 @@ namespace Cytar.Network
 
         private void SendThread()
         {
-            
+            while (Available)
+            {
+                
+            }
+
         }
 
         public void OnReset(UdpClient udpClient, IPEndPoint iPEndPoint)
