@@ -16,7 +16,8 @@ namespace Cytar.Network
         UnreliablePackage,
         ReliableSequenced,
         ReliableStateUpdate,
-        AllCostDelivery
+        AllCostDelivery,
+        Stream,
     }
     public class CytarUDPServer: CytarNetworkServer
     {
@@ -33,8 +34,7 @@ namespace Cytar.Network
                 qosType = value;
             }
         }
-
-        public Dictionary<IPEndPoint, UDPSession> Sessions { get; private set; } = new Dictionary<IPEndPoint, UDPSession>();
+        public Dictionary<uint, UDPSession> Sessions { get; private set; } = new Dictionary<uint, UDPSession>();
         public override bool Running
         {
             get;
@@ -118,17 +118,39 @@ namespace Cytar.Network
                     continue;
                 MemoryStream ms = new MemoryStream(data);
                 CytarStreamReader cr = new CytarStreamReader(ms);
-                var handshake = cr.ReadUInt32();
-                if (handshake == 0 )
+                var ssid = cr.ReadUInt32();
+                // Handle session setup
+                if (ssid == 0)
                 {
-                    UDPSession session = new UDPSession(remoteIP, UdpClient, QosType);
-                    Sessions[remoteIP] = session;
-                    session.OnStart();
-                    continue;
+                    var crc = cr.ReadUInt32();
+                    if (Crc32Algorithm.Compute(data, 8, 8) != crc)
+                        return;
+                    ssid = cr.ReadUInt32();
+                    // Reset a existed session
+                    if (ssid != 0)
+                    {
+                        if (Sessions.ContainsKey(ssid))
+                        {
+                            if (Sessions[ssid].RemoteIPAdress == remoteIP.Address)
+                            {
+                                Sessions[ssid].OnReset(UdpClient, remoteIP);
+                            }
+                        }
+                    }
+                    // Start a new session
+                    else
+                    {
+                        ssid = (uint)remoteIP.GetHashCode();
+                        UDPSession session = new UDPSession(remoteIP, UdpClient, QosType, ssid);
+                        session.StartInternal();
+                        continue;
+                    }
                 }
-                if (!Sessions.ContainsKey(remoteIP))
+                if (Sessions[ssid].RemoteIPAdress != remoteIP.Address)
                     continue;
-                Sessions[remoteIP].OnDataReceived(data);
+                if(Sessions[ssid].RemotePort != remoteIP.Port)
+                    Sessions[ssid].OnReset(UdpClient, remoteIP);
+                Sessions[ssid].OnDataReceived(cr.ReadBytes(data.Length - 4));
             }
         }
 
@@ -138,6 +160,7 @@ namespace Cytar.Network
             ServerThread.Abort();
             UdpClient.Dispose();
         }
+        
     }
 
 

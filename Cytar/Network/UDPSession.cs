@@ -17,11 +17,19 @@ namespace Cytar.Network
         public UDPSession(IPEndPoint iPEndPoint, CytarUDPQosType qosType):this(iPEndPoint,new UdpClient(), qosType)
         {
         }
-        public UDPSession(IPEndPoint iPEndPoint,UdpClient udpServer, CytarUDPQosType qosType)
+
+        public UDPSession(IPEndPoint iPEndPoint, UdpClient udpServer, CytarUDPQosType qosType)
         {
             QosType = qosType;
             UdpClient = udpServer;
             RemoteIPEndPoint = iPEndPoint;
+        }
+        internal UDPSession(IPEndPoint iPEndPoint,UdpClient udpServer, CytarUDPQosType qosType, uint ssid)
+        {
+            QosType = qosType;
+            UdpClient = udpServer;
+            RemoteIPEndPoint = iPEndPoint;
+            SSID = ssid;
         }
 
         public CytarUDPQosType QosType { get; set; }
@@ -30,11 +38,12 @@ namespace Cytar.Network
         protected List<CytarNetworkPackage> PackageReceived = new List<CytarNetworkPackage>();
         protected uint PackageSendSequence = 0;
         protected uint PackageReceivedSequence = 0;
-        public Thread HandleThread;
+        public Thread HandleThread { get; private set; }
         protected AutoResetEvent sendSignal = new AutoResetEvent(false);
         protected AutoResetEvent receiveSignal = new AutoResetEvent(false);
         public override bool Available { get; protected set ; }
-        public override uint SSID { get => throw new NotImplementedException(); protected set => throw new NotImplementedException(); }
+        public override uint SSID { get; protected set; }
+        /*public uint Token { get; protected set; }*/
         public override InputStream InputStream { get => throw new NotImplementedException(); protected set => throw new NotImplementedException(); }
         public override OutputStream OutputStream { get => throw new NotImplementedException(); protected set => throw new NotImplementedException(); }
 
@@ -162,13 +171,70 @@ namespace Cytar.Network
             }
         }
 
-        public void OnStart()
+        private void SendThread()
         {
-            Available = true;
-            HandleThread = new Thread(() =>
-            {
+            
+        }
 
-            });
+        public void OnReset(UdpClient udpClient, IPEndPoint iPEndPoint)
+        {
+            UdpClient = UdpClient;
+            RemoteIPEndPoint = iPEndPoint;
+            Available = true;
+            if (!HandleThread.IsAlive)
+            {
+                HandleThread = new Thread(SendThread);
+                HandleThread.Start();
+            }
+        }
+
+        public void Start()
+        {
+            Handshake();
+            Available = true;
+            HandleThread = new Thread(SendThread);
+            HandleThread.Start();
+        }
+
+        internal void Handshake()
+        {
+            /*if (!Available)
+                throw new InvalidOperationException("Cannot send handshake on an unavailable session.");*/
+
+            MemoryStream ms = new MemoryStream();
+            CytarStreamWriter cw = new CytarStreamWriter(ms);
+            cw.Write((uint)0);
+            cw.Write((uint)0);
+            cw.Write((uint)0);
+            Again:
+            UdpClient.Send(ms.GetBuffer(), 12, RemoteIPEndPoint);
+            IPEndPoint ip = null;
+            var data = UdpClient.Receive(ref ip);
+            if(!ip.Equals(RemoteIPEndPoint))
+                goto Again;
+            ms = new MemoryStream(data);
+            CytarStreamReader cr = new CytarStreamReader(ms);
+            var packseq = cr.ReadUInt32();
+            if (packseq != 0)
+                throw new UnexpectDataException();
+            var ssid = cr.ReadUInt32();
+            SSID = cr.ReadUInt32();
+        }
+
+        internal void ReplyHandshake()
+        {
+            MemoryStream ms = new MemoryStream();
+            CytarStreamWriter cw = new CytarStreamWriter(ms);
+            cw.Write(0);
+            cw.Write(SSID);
+            UdpClient.Send(ms.GetBuffer(), 8, RemoteIPEndPoint);
+        }
+
+        internal void StartInternal()
+        {
+            ReplyHandshake();
+            Available = true;
+            HandleThread = new Thread(SendThread);
             HandleThread.Start();
         }
 
