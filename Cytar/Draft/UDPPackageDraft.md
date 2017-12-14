@@ -7,8 +7,7 @@ Position | Type | Data
 12 | UInt32 | RestLength
 16 | UInt32 | AckPack
 20 | UInt32 | AckData
-24 | UInt32 | PackCRC
-28 | Byte[Length] | Data
+24 | Byte[Length] | Data
 
 # Handshake Package Structure
 Position | Type | Data

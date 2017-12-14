@@ -13,7 +13,6 @@ namespace Cytar.Network
     public enum CytarUDPQosType
     {
         Unreliable,
-        UnreliablePackage,
         ReliableSequenced,
         ReliableStateUpdate,
         AllCostDelivery,

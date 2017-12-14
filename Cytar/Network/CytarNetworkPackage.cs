@@ -9,6 +9,7 @@ namespace Cytar.Network
     {
         internal uint PackSequence = 0;
         internal uint SendSequence = 0;
+        internal uint AckSequence = 0;
         internal byte[] buffer = new byte [0];
         internal bool Ready = false;
         public bool Lock { get; set; } = false;
