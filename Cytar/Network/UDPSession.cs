@@ -33,6 +33,11 @@ namespace Cytar.Network
             SSID = ssid;
         }
 
+        /// <summary>
+        /// The max sleep time of sending loop in millisecond.
+        /// </summary>
+        public int SendFrequence { get; set; } = 5;
+
         public CytarUDPQosType QosType { get; set; }
         public UdpClient UdpClient { get; private set; }
         protected List<CytarNetworkPackage> PackageToSend = new List<CytarNetworkPackage>();
@@ -236,6 +241,7 @@ namespace Cytar.Network
                         }
                     }
                 }
+                sendSignal.WaitOne(SendFrequence);
             }
 
         }
@@ -244,6 +250,7 @@ namespace Cytar.Network
         {
             MemoryStream ms = new MemoryStream();
             CytarStreamWriter cw = new CytarStreamWriter(ms);
+            cw.Write(SSID);
             cw.Write(packSeq);
             cw.Write(dataSeq);
             cw.Write(restLength);
@@ -340,6 +347,9 @@ namespace Cytar.Network
         {
             if (!Available)
                 return;
+            MemoryStream ms = new MemoryStream(data);
+            CytarStreamReader cr = new CytarStreamReader(ms);
+            
         }
     }
 }
