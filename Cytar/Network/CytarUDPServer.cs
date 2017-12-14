@@ -133,7 +133,9 @@ namespace Cytar.Network
 
         public override void Stop()
         {
-            throw new NotImplementedException();
+            Running = false;
+            ServerThread.Abort();
+            UdpClient.Dispose();
         }
     }
 
