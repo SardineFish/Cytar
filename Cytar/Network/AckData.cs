@@ -8,5 +8,11 @@ namespace Cytar.Network
     {
         public uint PackageSequence;
         public uint DataSequence;
+
+        public AckData(uint packageSequence, uint dataSequence)
+        {
+            PackageSequence = packageSequence;
+            DataSequence = dataSequence;
+        }
     }
 }

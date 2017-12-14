@@ -8,8 +8,23 @@ namespace Cytar.Network
     public class CytarNetworkPackage
     {
         internal uint PackSequence = 0;
-        internal uint SendSequence = 0;
-        internal uint AckSequence = 0;
+        internal uint Sequence = 0;
+
+        private uint ack = 0;
+        internal uint AckSequence
+        {
+            get { return ack; }
+            set
+            {
+                var length = value - ack;
+                if (length <= 0)
+                    return;
+                var newBuffer = new byte[buffer.Length - length];
+                Array.Copy(buffer, length, newBuffer, 0, buffer.Length - length);
+                buffer = newBuffer;
+            }
+        }
+
         internal byte[] buffer = new byte [0];
         internal bool Ready = false;
         public bool Lock { get; set; } = false;
@@ -38,6 +53,11 @@ namespace Cytar.Network
         public CytarNetworkPackage(byte[] data)
         {
             buffer = data;
+        }
+
+        public CytarNetworkPackage(long length) : this(new byte[length])
+        {
+            
         }
     }
 }
