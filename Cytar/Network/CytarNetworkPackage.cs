@@ -18,13 +18,17 @@ namespace Cytar.Network
             get { return ack; }
             set
             {
-                var length = (long)value - (long)ack;
-                if (length <= 0)
-                    return;
-                var newBuffer = new byte[buffer.Length - length];
-                Array.Copy(buffer, length, newBuffer, 0, buffer.Length - length);
-                buffer = newBuffer;
-                ack = value;
+                lock (this)
+                {
+                    var length = (long)value - (long)ack;
+                    if (length <= 0)
+                        return;
+                    var newBuffer = new byte[buffer.Length - length];
+                    Array.Copy(buffer, length, newBuffer, 0, buffer.Length - length);
+                    buffer = newBuffer;
+                    ack = value;
+
+                }
             }
         }
 
@@ -102,7 +106,8 @@ namespace Cytar.Network
             lock (this)
             {
                 if (seq < BeginSequence)
-                    throw new IOException("Cannot read abandoned data.");
+                    return 0;
+                    //throw new IOException("Cannot read abandoned data.");
                 length = (int) Math.Min(WritePosition - seq, length);
                 Array.Copy(this.buffer, seq - BeginSequence, buffer, offset, length);
                 return length;
@@ -124,6 +129,13 @@ namespace Cytar.Network
                 BeginSequence = (uint)(seq + length);
                 return length;
             }
+        }
+
+        public byte[] Read()
+        {
+            var data = buffer;
+            BeginSequence = (uint)WritePosition;
+            return data;
         }
 
         public long Write(byte[] data)
@@ -155,6 +167,8 @@ namespace Cytar.Network
                     return 0;
                 Array.Copy(data, srcOffset, buffer, offset, length);
                 WritePosition = seq + length;
+                if (WritePosition > Length && !Lock)
+                    Length = WritePosition;
                 return length;
             }
         }

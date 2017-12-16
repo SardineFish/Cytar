@@ -465,7 +465,7 @@ namespace Cytar.Network
                 var packAck = cr.ReadUInt32();
                 var dataAck = cr.ReadUInt32();
                 var dataRecv = cr.ReadBytes(data.Length - 20);
-                Console.WriteLine("Rceive pack={0}, seq={1}, ackPack={2}, ack={3}", packSeq, dataSeq, packAck, dataAck);
+                //Console.WriteLine("Rceive pack={0}, seq={1}, ackPack={2}, ack={3}", packSeq, dataSeq, packAck, dataAck);
                 // Handle ACK
                 if (packAck != 0)
                 {
@@ -503,7 +503,10 @@ namespace Cytar.Network
                         PackageReceived[packSeq].Ready = true;
 
                 }
-                AckToSend[packSeq] = new AckData(packSeq, PackageReceived[packSeq].Sequence);
+                lock (AckToSend)
+                {
+                    AckToSend[packSeq] = new AckData(packSeq, PackageReceived[packSeq].Sequence);
+                }
                 receiveSignal.Set();
                 sendSignal.Set();
             }

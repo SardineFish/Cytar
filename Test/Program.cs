@@ -26,7 +26,7 @@ namespace Test
                 package = new CytarNetworkPackage(800000);
                 session.SendPackage(package);
                 var length = 0;
-                while (length < 800000)
+                while (length < 80000000)
                 {
                     var buffer = new byte[package.BufferSize];
                     random.NextBytes(buffer);

@@ -24,9 +24,17 @@ namespace Test_Client
             var package = session.ReceivePackage();
             byte[] buffer = new byte[package.Length];
             long length = 0;
+            var time = DateTime.Now.Ticks;
+            var count = 0;
             while (length < package.Length)
             {
-                length += package.Read((int)length, (int)package.Length, buffer, (int)length);
+                package.Read();
+                if (++count % 100 == 0)
+                {
+                    var speed = (double)package.WritePosition / 1000 / (double)((DateTime.Now.Ticks - time) / 10000000);
+                    Console.WriteLine("Speed = {0} KB/s", speed);
+                }
+                //length += package.Read((int)length, (int)package.Length, buffer, (int)length);
             }
         }
     }
