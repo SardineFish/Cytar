@@ -18,7 +18,7 @@ namespace Cytar.Network
             get { return ack; }
             set
             {
-                var length = value - ack;
+                var length = (long)value - (long)ack;
                 if (length <= 0)
                     return;
                 var newBuffer = new byte[buffer.Length - length];
@@ -31,6 +31,8 @@ namespace Cytar.Network
         internal byte[] buffer = new byte [0];
         internal bool Ready = false;
         internal bool Received = false;
+        internal long lastAckTime = 0;
+        public long ResendTimeOut{ get; set; } = 10;
         
         public bool Lock { get; set; } = false;
 
@@ -79,6 +81,17 @@ namespace Cytar.Network
             Length = length;
         }
 
+        internal void Ack(uint ack)
+        {
+            lastAckTime = DateTime.Now.Ticks;
+            BeginSequence = ack;
+        }
+
+        internal bool AckTimeOut()
+        {
+            return (DateTime.Now.Ticks - lastAckTime) / 10000 > ResendTimeOut;
+        }
+
         internal int ReadInternal(int seq, int length, byte[] buffer)
         {
             return ReadInternal(seq, length, buffer, 0);
@@ -116,24 +129,6 @@ namespace Cytar.Network
         public long Write(byte[] data)
         {
             return Write(data, WritePosition, data.Length);
-            lock (this)
-            {
-                
-                if (Lock)
-                    throw new InvalidOperationException("Cannot write into a locked package.");
-                if (WritePosition + data.Length > Length)
-                {
-                    ResetLength(WritePosition + data.Length);
-                }
-                var offset = WritePosition - BeginSequence;
-                if (offset + data.Length > buffer.Length)
-                {
-                    Array.Resize<byte>(ref buffer, (int)(offset + data.Length));
-                }
-                Array.Copy(data, 0, buffer, offset, data.Length);
-                WritePosition += data.Length;
-                return data.Length;
-            }
         }
 
         public long Write(byte[] data, long seq, long length)
@@ -143,10 +138,12 @@ namespace Cytar.Network
                 long srcOffset = 0;
                 if (seq < BeginSequence)
                 {
-                    srcOffset = seq - BeginSequence;
-                    length -= (seq - BeginSequence);
+                    srcOffset = BeginSequence - seq;
+                    length -= (BeginSequence-seq);
                     seq = BeginSequence;
                 }
+                if (length <= 0)
+                    return 0;
                 var offset = seq - BeginSequence;
                 if (offset + length > BufferSize)
                     length = BufferSize - offset;
@@ -157,7 +154,7 @@ namespace Cytar.Network
                 if (offset == buffer.Length)
                     return 0;
                 Array.Copy(data, srcOffset, buffer, offset, length);
-                WritePosition += length;
+                WritePosition = seq + length;
                 return length;
             }
         }

@@ -75,6 +75,17 @@ public class SortedDict<keyT,valueT> where keyT: IComparable
         return item;
     }
 
+    public valueT Remove(keyT key)
+    {
+        var idx = Keys.IndexOf(key);
+        if (idx < 0)
+            return default(valueT);
+        Keys.RemoveAt(idx);
+        var value = Values[idx];
+        Values.RemoveAt(idx);
+        return value;
+    }
+
     public void RemoveRange(int index, int count)
     {
         Keys.RemoveRange(index, count);
