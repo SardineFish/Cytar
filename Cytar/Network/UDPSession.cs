@@ -36,7 +36,7 @@ namespace Cytar.Network
         /// <summary>
         /// The max sleep time of sending loop in millisecond.
         /// </summary>
-        public int SendFrequence { get; set; } = 5;
+        public int SendFrequence { get; set; } = 20;
 
         public CytarUDPQosType QosType { get; set; }
         public UdpClient UdpClient { get; private set; }
@@ -308,7 +308,7 @@ namespace Cytar.Network
                     byte[] buffer;
                     while (sentLength < package.WritePosition-package.Sequence)
                     {
-                        var readLength = UdpClient.Client.ReceiveBufferSize - 64;
+                        var readLength = 60000;//UdpClient.Client.ReceiveBufferSize - 64;
                         buffer = new byte[readLength];
                         readLength = package.ReadInternal((int) (package.Sequence + sentLength), readLength,
                             buffer, 0);
@@ -465,7 +465,7 @@ namespace Cytar.Network
                 var packAck = cr.ReadUInt32();
                 var dataAck = cr.ReadUInt32();
                 var dataRecv = cr.ReadBytes(data.Length - 20);
-                //Console.WriteLine("Rceive pack={0}, seq={1}, ackPack={2}, ack={3}", packSeq, dataSeq, packAck, dataAck);
+                Console.WriteLine("Rceive pack={0}, seq={1}, ackPack={2}, ack={3}", packSeq, dataSeq, packAck, dataAck);
                 // Handle ACK
                 if (packAck != 0)
                 {

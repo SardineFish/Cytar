@@ -17,7 +17,7 @@ namespace Test_Client
     {
         static void Main(string[] args)
         {
-            UDPSession session = new UDPSession(new IPEndPoint(IPAddress.Loopback, 45678));
+            UDPSession session = new UDPSession(new IPEndPoint(IPAddress.Parse("101.132.166.86"), 45678));
             session.QosType = CytarUDPQosType.ReliablePackage;
             session.Start();
             session.SendPackage(new CytarNetworkPackage(new byte[] {2, 3, 3, 3, 3, 3, 3, 3}));
@@ -29,11 +29,11 @@ namespace Test_Client
             while (length < package.Length)
             {
                 package.Read();
-                if (++count % 100 == 0)
+                /*if (++count % 100 == 0)
                 {
                     var speed = (double)package.WritePosition / 1000 / (double)((DateTime.Now.Ticks - time) / 10000000);
                     Console.WriteLine("Speed = {0} KB/s", speed);
-                }
+                }*/
                 //length += package.Read((int)length, (int)package.Length, buffer, (int)length);
             }
         }
