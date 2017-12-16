@@ -7,12 +7,14 @@ using System.Threading;
 using Force.Crc32;
 using System.IO;
 using Cytar.IO;
+using System.Threading.Tasks;
 
 namespace Cytar.Network
 {
     public enum CytarUDPQosType
     {
         Unreliable,
+        ReliablePackage,
         ReliableSequenced,
         ReliableStateUpdate,
         AllCostDelivery,
@@ -25,7 +27,7 @@ namespace Cytar.Network
         private CytarUDPQosType qosType = CytarUDPQosType.Unreliable;
         public CytarUDPQosType QosType
         {
-            get { return QosType; }
+            get { return qosType; }
             set
             {
                 if (Running)
@@ -34,6 +36,7 @@ namespace Cytar.Network
             }
         }
         public Dictionary<uint, UDPSession> Sessions { get; private set; } = new Dictionary<uint, UDPSession>();
+        public Action<UDPSession> OnSessionSetupCallback = null;
         public override bool Running
         {
             get;
@@ -129,9 +132,6 @@ namespace Cytar.Network
                 // Handle session setup
                 if (ssid == 0)
                 {
-                    var crc = cr.ReadUInt32();
-                    if (Crc32Algorithm.Compute(data, 8, 8) != crc)
-                        return;
                     ssid = cr.ReadUInt32();
                     // Reset a existed session
                     if (ssid != 0)
@@ -149,11 +149,16 @@ namespace Cytar.Network
                     {
                         ssid = (uint)remoteIP.GetHashCode();
                         UDPSession session = new UDPSession(remoteIP, UdpClient, QosType, ssid);
+                        Sessions[ssid] = session;
                         session.StartInternal();
+                        Task.Run(() =>
+                        {
+                            OnSessionSetupCallback?.Invoke(session);
+                        });
                         continue;
                     }
                 }
-                if (Sessions[ssid].RemoteIPAdress != remoteIP.Address)
+                if (!Sessions[ssid].RemoteIPAdress.Equals(remoteIP.Address))
                     continue;
                 if(Sessions[ssid].RemotePort != remoteIP.Port)
                     Sessions[ssid].OnReset(UdpClient, remoteIP);

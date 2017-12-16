@@ -46,6 +46,7 @@ namespace Cytar.Network
         protected uint PackageSendSequence = 0;
         protected uint PackageReceivedSequence = 0;
         public Thread HandleThread { get; private set; }
+        public Thread ReceiveThread { get; private set; }
         protected AutoResetEvent sendSignal = new AutoResetEvent(false);
         protected AutoResetEvent receiveSignal = new AutoResetEvent(false);
         protected AutoResetEvent closeSignal = new AutoResetEvent(false);
@@ -194,6 +195,29 @@ namespace Cytar.Network
             }
         }
 
+        private void ReceiveFunc()
+        {
+            while (Available)
+            {
+                IPEndPoint ip = null;
+                var data = UdpClient.Receive(ref ip);
+                if (!ip.Address.Equals(RemoteIPAdress))
+                    continue;
+                MemoryStream ms = new MemoryStream(data);
+                CytarStreamReader cr = new CytarStreamReader(ms);
+                var ssid = cr.ReadUInt32();
+                if (ssid == 0)
+                {
+                    ssid = cr.ReadUInt32();
+                    if (ssid != SSID)
+                        continue;
+                }
+                else if (ssid != SSID)
+                    continue;
+
+                OnDataReceived(cr.ReadBytes(data.Length - 4));
+            }
+        }
         private void SendThread()
         {
             while (Available)
@@ -201,21 +225,31 @@ namespace Cytar.Network
                 for (var i = 0; i < PackageToSend.Count; i++)
                 {
                     var package = PackageToSend[i];
+                    SendPackageInternal(package);
+                    /*
+                    if (QosType == CytarUDPQosType.Unreliable)
+                    {
+                        lock (PackageToSend)
+                        {
+                            PackageToSend.RemoveAt(i);
+                            i--;
+                        }
+                    }
                     if (QosType == CytarUDPQosType.ReliableSequenced || QosType == CytarUDPQosType.ReliableStateUpdate || QosType == CytarUDPQosType.Unreliable)
                     {
                         lock (package)
                         {
-                            int sentLength = (int) (package.Sequence - package.AckSequence);
-                            while (sentLength == package.Buffer.Length)
+                            int sentLength = (int) (package.Sequence - package.BeginSequence);
+                            while (sentLength < package.Buffer.Length)
                             {
-                                sentLength += SendDate(
+                                sentLength += SendData(
                                     packSeq: package.PackSequence,
                                     dataSeq: package.Sequence,
-                                    restLength: (uint) (package.buffer.Length - sentLength),
+                                    restLength: (uint) (package.Length-package.Sequence),
                                     data: package.buffer,
                                     offset: sentLength,
                                     length: package.Buffer.Length - sentLength);
-                                package.Sequence = (uint)(package.AckSequence + 1 + sentLength);
+                                package.Sequence = (uint)(package.BeginSequence + 1 + sentLength);
                             }
                         }
                         if(QosType == CytarUDPQosType.Unreliable)
@@ -232,26 +266,82 @@ namespace Cytar.Network
                         lock (package)
                         {
                             var sentLength = 0;
-                            while (sentLength == package.Buffer.Length)
+                            while (sentLength <= package.Buffer.Length)
                             {
-                                sentLength += SendDate(
+                                sentLength += SendData(
                                     packSeq: package.PackSequence,
                                     dataSeq: package.Sequence,
-                                    restLength: (uint)(package.buffer.Length - sentLength),
+                                    restLength: (uint)(package.Length - package.Sequence),
                                     data: package.buffer,
                                     offset: sentLength,
                                     length: package.Buffer.Length - sentLength);
-                                package.Sequence = (uint)(package.AckSequence + 1 + sentLength);
+                                package.Sequence = (uint)(package.BeginSequence + 1 + sentLength);
                             }
                         }
-                    }
+                    }*/
+                }
+                while (AckToSend.Count > 0)
+                {
+                    SendData(0, 0, 0, new byte[0], 0, 0);
                 }
                 sendSignal.WaitOne(SendFrequence);
             }
 
         }
 
-        private int SendDate(uint packSeq, uint dataSeq,uint restLength, byte[] data, int offset, int length)
+        private void SendPackageInternal(CytarNetworkPackage package)
+        {
+            lock (package)
+            {
+                if (QosType == CytarUDPQosType.ReliableSequenced || QosType == CytarUDPQosType.ReliableStateUpdate || QosType == CytarUDPQosType.Unreliable)
+                {
+                    var sentLength = 0;
+
+                    byte[] buffer;
+                    while (sentLength < package.WritePosition-package.Sequence)
+                    {
+                        var readLength = UdpClient.Client.ReceiveBufferSize - 64;
+                        buffer = new byte[readLength];
+                        readLength = package.ReadInternal((int) (package.Sequence + sentLength), readLength,
+                            buffer, 0);
+
+                        sentLength += SendData(
+                            packSeq: package.PackSequence,
+                            dataSeq: package.Sequence,
+                            restLength: (uint) (package.Length - package.Sequence),
+                            data: buffer,
+                            offset: 0,
+                            length: readLength);
+
+                        package.Sequence = (uint) (package.Sequence + sentLength);
+                    }
+                }
+                else if (QosType == CytarUDPQosType.AllCostDelivery)
+                {
+                    var sentLength = 0;
+                    package.Sequence = package.BeginSequence;
+                    byte[] buffer;
+                    while (sentLength < package.WritePosition - package.Sequence)
+                    {
+                        var readLength = UdpClient.Client.ReceiveBufferSize;
+                        buffer = new byte[readLength];
+                        readLength = package.ReadInternal((int)(package.Sequence + sentLength), readLength,
+                            buffer, 0);
+
+                        sentLength += SendData(
+                            packSeq: package.PackSequence,
+                            dataSeq: package.Sequence,
+                            restLength: (uint)(package.Length - package.Sequence),
+                            data: buffer,
+                            offset: 0,
+                            length: readLength);
+
+                        package.Sequence = (uint)(package.Sequence + sentLength);
+                    }
+                }
+            }
+        }
+        private int SendData(uint packSeq, uint dataSeq,uint restLength, byte[] data, int offset, int length)
         {
             MemoryStream ms = new MemoryStream();
             CytarStreamWriter cw = new CytarStreamWriter(ms);
@@ -277,7 +367,7 @@ namespace Cytar.Network
                 cw.Write((uint)0);
             }
             cw.Write(data, offset, length);
-            return UdpClient.Send(ms.GetBuffer(), length, RemoteIPEndPoint) - 24;
+            return UdpClient.Send(ms.GetBuffer(), (int)ms.Length, RemoteIPEndPoint) - 24;
         }
 
         public void OnReset(UdpClient udpClient, IPEndPoint iPEndPoint)
@@ -298,6 +388,9 @@ namespace Cytar.Network
             Available = true;
             HandleThread = new Thread(SendThread);
             HandleThread.Start();
+            ReceiveThread = new Thread(ReceiveFunc);
+            ReceiveThread.Start();
+            PackageSendSequence = 1;
         }
 
         internal void Handshake()
@@ -307,7 +400,6 @@ namespace Cytar.Network
 
             MemoryStream ms = new MemoryStream();
             CytarStreamWriter cw = new CytarStreamWriter(ms);
-            cw.Write((uint)0);
             cw.Write((uint)0);
             cw.Write((uint)0);
             Again:
@@ -321,7 +413,6 @@ namespace Cytar.Network
             var packseq = cr.ReadUInt32();
             if (packseq != 0)
                 throw new UnexpectDataException();
-            var ssid = cr.ReadUInt32();
             SSID = cr.ReadUInt32();
         }
 
@@ -340,6 +431,7 @@ namespace Cytar.Network
             Available = true;
             HandleThread = new Thread(SendThread);
             HandleThread.Start();
+            PackageSendSequence = 1;
         }
 
         public void OnBadData(byte[] data)
@@ -373,9 +465,11 @@ namespace Cytar.Network
                     var packageToAck = PackageToSend.Where(package => package.PackSequence == packAck).FirstOrDefault();
                     if (packageToAck != null)
                     {
-                        packageToAck.AckSequence = dataAck;
+                        packageToAck.BeginSequence = dataAck;
                     }
                 }
+                if (packSeq == 0)
+                    return;
                 // Check whether package is out of time.
                 if (packSeq <= PackageReceivedSequence)
                 {
@@ -391,16 +485,18 @@ namespace Cytar.Network
                     package.PackSequence = packSeq;
                     PackageReceived.Add(packSeq, package);
                 }
-
-                Array.Copy(data, 0, PackageReceived[packSeq].buffer, packSeq, dataRecv.Length);
-                if (packSeq <= PackageReceived[packSeq].Sequence)
+                //Array.Copy(dataRecv, 0, PackageReceived[packSeq].buffer, dataSeq, dataRecv.Length);
+                if (dataSeq <= PackageReceived[packSeq].Sequence)
                 {
-                    PackageReceived[packSeq].Sequence =(uint)(packSeq + dataRecv.Length);
-                    if (PackageReceived[packSeq].Sequence == PackageReceived[packSeq].Length)
+                    PackageReceived[packSeq].Write(dataRecv,dataSeq,dataRecv.Length);
+                    PackageReceived[packSeq].Sequence =(uint)(dataSeq + dataRecv.Length);
+                    PackageReceived[packSeq].ResetLength(dataSeq + restLength);
+                    if (PackageReceived[packSeq].Sequence == PackageReceived[packSeq].Length || restLength == 0)
                         PackageReceived[packSeq].Ready = true;
-                        
+
                 }
                 AckToSend[packSeq] = new AckData(packSeq, PackageReceived[packSeq].Sequence);
+                receiveSignal.Set();
             }
         }
     }
