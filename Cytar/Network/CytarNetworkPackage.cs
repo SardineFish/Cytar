@@ -30,6 +30,8 @@ namespace Cytar.Network
 
         internal byte[] buffer = new byte [0];
         internal bool Ready = false;
+        internal bool Received = false;
+        
         public bool Lock { get; set; } = false;
 
         public long Length { get; private set; }
@@ -150,10 +152,12 @@ namespace Cytar.Network
                     length = BufferSize - offset;
                 if (offset + length > buffer.Length)
                 {
-                    Array.Resize<byte>(ref buffer, (int)(offset + data.Length));
+                    Array.Resize<byte>(ref buffer, (int)(offset + length));
                 }
-                Array.Copy(data, srcOffset, buffer, offset, data.Length);
-                WritePosition += Length;
+                if (offset == buffer.Length)
+                    return 0;
+                Array.Copy(data, srcOffset, buffer, offset, length);
+                WritePosition += length;
                 return length;
             }
         }

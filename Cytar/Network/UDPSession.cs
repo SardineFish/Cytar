@@ -103,6 +103,7 @@ namespace Cytar.Network
             {
                 if (PackageReceived.Count > 0)
                 {
+
                     if (QosType == CytarUDPQosType.ReliableSequenced)
                     {
                         lock (PackageReceived)
@@ -127,6 +128,21 @@ namespace Cytar.Network
                                     package = PackageReceived.Values[i];
                                     PackageReceived.RemoveRange(0, i + 1);
                                     PackageReceivedSequence = package.PackSequence;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    else if (QosType == CytarUDPQosType.ReliablePackage)
+                    {
+                        lock (PackageReceived)
+                        {
+                            for (var i = PackageReceived.Count - 1; i >= 0; i--)
+                            {
+                                if (!PackageReceived.Values[i].Received)
+                                {
+                                    package = PackageReceived.Values[i];
+                                    package.Received = true;
                                     break;
                                 }
                             }
@@ -184,16 +200,6 @@ namespace Cytar.Network
             sendSignal.Set();
         }
 
-        protected void SendPackageInternal()
-        {
-            while (Available)
-            {
-                for (var i = 0; i < PackageToSend.Count; i++)
-                {
-                    //if(PackageToSend[i].SendSequence)
-                }
-            }
-        }
 
         private void ReceiveFunc()
         {
@@ -293,7 +299,7 @@ namespace Cytar.Network
         {
             lock (package)
             {
-                if (QosType == CytarUDPQosType.ReliableSequenced || QosType == CytarUDPQosType.ReliableStateUpdate || QosType == CytarUDPQosType.Unreliable)
+                if (QosType == CytarUDPQosType.ReliableSequenced || QosType == CytarUDPQosType.ReliableStateUpdate || QosType == CytarUDPQosType.Unreliable || QosType == CytarUDPQosType.ReliablePackage)
                 {
                     var sentLength = 0;
 
@@ -447,7 +453,7 @@ namespace Cytar.Network
                 return;
             if (QosType == CytarUDPQosType.Stream)
             {
-
+                
             }
             else
             {

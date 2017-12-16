@@ -18,7 +18,7 @@ namespace Test_Client
         static void Main(string[] args)
         {
             UDPSession session = new UDPSession(new IPEndPoint(IPAddress.Loopback, 45678));
-            session.QosType = CytarUDPQosType.ReliableSequenced;
+            session.QosType = CytarUDPQosType.ReliablePackage;
             session.Start();
             session.SendPackage(new CytarNetworkPackage(new byte[] {2, 3, 3, 3, 3, 3, 3, 3}));
             var package = session.ReceivePackage();
@@ -26,7 +26,7 @@ namespace Test_Client
             long length = 0;
             while (length < package.Length)
             {
-                package.Read((int)length, (int)package.Length, buffer, (int)length);
+                length += package.Read((int)length, (int)package.Length, buffer, (int)length);
             }
         }
     }

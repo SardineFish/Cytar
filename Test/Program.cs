@@ -18,7 +18,7 @@ namespace Test
         {
             var random = new System.Random();
             CytarUDPServer udp = new CytarUDPServer("127.0.0.1", 45678);
-            udp.QosType = CytarUDPQosType.ReliableSequenced;
+            udp.QosType = CytarUDPQosType.ReliablePackage;
             udp.OnSessionSetupCallback = (session) =>
             {
                 var package = session.ReceivePackage();
