@@ -308,7 +308,7 @@ namespace Cytar.Network
                     byte[] buffer;
                     while (sentLength < package.WritePosition-package.Sequence)
                     {
-                        var readLength = 60000;//UdpClient.Client.ReceiveBufferSize - 64;
+                        var readLength = 1200;//UdpClient.Client.ReceiveBufferSize - 64;
                         buffer = new byte[readLength];
                         readLength = package.ReadInternal((int) (package.Sequence + sentLength), readLength,
                             buffer, 0);

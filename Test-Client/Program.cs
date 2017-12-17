@@ -17,7 +17,7 @@ namespace Test_Client
     {
         static void Main(string[] args)
         {
-            UDPSession session = new UDPSession(new IPEndPoint(IPAddress.Parse("101.132.166.86"), 45678));
+            UDPSession session = new UDPSession(new IPEndPoint(Dns.GetHostAddresses("server.dwscdv3.com")[0], 45678));
             session.QosType = CytarUDPQosType.ReliablePackage;
             session.Start();
             session.SendPackage(new CytarNetworkPackage(new byte[] {2, 3, 3, 3, 3, 3, 3, 3}));
