@@ -97,7 +97,7 @@ namespace Cytar
         protected virtual void StartHandle()
         {
             Actived = true;
-            while (NetworkSession.Connected)
+            while (NetworkSession.Available)
             {
                 try
                 {
